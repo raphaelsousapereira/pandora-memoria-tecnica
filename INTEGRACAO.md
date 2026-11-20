@@ -1,0 +1,3 @@
+## Memória técnica obrigatória da PANDORA
+
+Antes da primeira alteração e antes de publicar, consulte a main de raphaelsousapereira/pandora-memoria-tecnica. Abra AGENTS.md e MEMORIA.md pelo conector GitHub autenticado ou por uma cópia Git atualizada. Busque o sintoma e o componente. Registre no PR ou no histórico de execução o commit consultado, o ID aplicável e o teste que será executado. Ao fechar o trabalho, acrescente a descoberta em MEMORIA.md seguindo MODELO.md, ou explique por que o caso existente continua suficiente. Referencie o commit da atualização. Preserve instruções específicas deste projeto.
