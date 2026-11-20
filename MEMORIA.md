@@ -125,3 +125,6 @@ O pacote pandora_video usa FFmpeg e Whisper local. pandora-motion contém efeito
 ### VIDEO-2026-002 · Integração com clientes MCP
 
 Encontrado servidor remoto OAuth preexistente em /mcp. O registro da ferramenta preparar_edicao_video permite aos clientes montar o pedido, validar duração e abrir o editor com a instrução preenchida. Reutilizar o fluxo de consentimento existente. Não presumir que um endpoint publicado implica instalação numa conta ou acesso aos arquivos anexados no chat. Renderização web exige selecionar o arquivo e confirmar no Studio. Testados o link e a validação de argumentos; autenticação real dentro de cada cliente é um aceite separado. [PR #261](https://github.com/raphaelsousapereira/pandora-cloud/pull/261).
+
+## Studio de vídeo · estilos de legenda · 20/11/2026
+Manter o catálogo no pacote Python e fornecer ao navegador os mesmos IDs usados na exportação. A prévia usa CSS e pode variar conforme a fonte do aparelho. O renderizador só aceita IDs cadastrados e converte as cores RGB para a ordem BGR do libass. Preservar o comportamento de pedidos sem estilo. Validar quantidade e unicidade dos estilos e exportar um vídeo com fala real. No PR #262 o teste local com Tarja · Oceano gerou seis segundos de H.264/AAC. A integração fica em pandora_video e requer o modelo de transcrição disponível no serviço.
