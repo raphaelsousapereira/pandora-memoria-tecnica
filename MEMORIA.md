@@ -1,5 +1,7 @@
 # Memória técnica acumulativa da PANDORA
 
+Índice adicional: ENCONTROS-2026-001 · reuniões · gravação longa · reenvio · decisões · fatos editoriais.
+
 Índice pesquisável: AUDIO-2026-001 · Dora · microfone oculto · Render live · Whisper · feature flag · Chromium · transcrição em português. Acrescente os próximos projetos ao índice e ao final do arquivo.
 
 ## 2026-11-20 · AUDIO-2026-001 · O portal estava online e o microfone continuava oculto
@@ -68,3 +70,23 @@ Verificar status e variáveis antes de propor mais RAM, disco ou plano de worksp
 - [Código publicado](https://github.com/raphaelsousapereira/pandora-cloud/tree/903bfb9502fdbfc6a4dcd732646f003940704f3e)
 - [Deploy de ativação](https://dashboard.render.com/web/srv-dbmj0q6417fc73eobvtg/deploys/dep-dc0bdpon74is73b2e62g)
 - Captura fornecida pelo usuário, “Captura de tela 2026-11-20 181254.png”, e confirmação nesta conversa. O original ficou na conversa.
+
+## 2026-11-20 · ENCONTROS-2026-001 · Captura de reuniões por etapa e separação editorial
+
+**Origem.** Projeto pandora-cloud. O caso AUDIO-2026-001, consultado na versão ff2a5deb da memória, comprovava ditado curto com revisão. O novo pedido exige persistência por cliente e etapa, consulta posterior, decisões confirmadas e seleção de fatos para uso no site. Primeira verificação escolhida: salvar uma parte WebM, relê-la pelo endpoint autenticado e enviá-la ao motor local real.
+
+**Implementação e pontos de entrada.** Em Assistente ou Visão geral, selecionar o site e abrir “Encontros do projeto”. O formulário aceita projeto, etapa, participantes e o registro da concordância. A rota /encontros usa a sessão do portal. A API /api/encontros verifica o site e limita cada encontro ao usuário criador, organização e site. Na interface, projeto e etapa são campos do encontro; não representam uma sincronização com uma entidade de CRM ou contrato. O histórico ordena os registros pela data de criação.
+
+**Como tratar mídia.** Capturar partes independentes com MediaRecorder e preservar o contêiner completo de cada gravação. No navegador, salvar o blob na IndexedDB antes da transferência. A chave de reenvio é encontro + sequência. O servidor compara SHA-256, aceita repetição do conteúdo e rejeita conteúdo diferente na mesma posição com 409. Registrar a posição de início e a duração medida. Evitar multiplicar a duração nominal pelo número de eventos. A entrega de eventos pode atrasar devido ao navegador ou à suspensão do dispositivo. A troca entre gravações pode introduzir pequenas lacunas; qualificar isso com dispositivos reais antes de prometer continuidade acústica.
+
+**Sincronização, privacidade e capacidade.** Após pausar, o cliente solicita a transcrição das partes por ordem. O botão de sincronização retoma trechos pendentes quando a mesma conta reabre o mesmo encontro no mesmo navegador. Fechar a página interrompe a captura e o processamento comandado pelo cliente. A parte em gravação ainda pode estar em memória. Usar a sequência e o estado de cada trecho para informar o último progresso conhecido. O modelo real e o controle de concorrência são os mesmos do ditado. O limite inicial de dados de áudio é 128 MiB agregados na base do serviço. SQL NULL libera os blobs para reúso interno do SQLite; isso não reduz imediatamente o tamanho do arquivo físico nem elimina backups. O comando de exclusão do áudio exige que todos os trechos já estejam transcritos. Para crescer: dimensionar retenção e concorrência por cliente, avaliar armazenamento de objetos e worker com fila persistente. Não alterar planos com base apenas no rótulo da hospedagem.
+
+**Decisão e origem.** Guardar transcrição, correção, marcação, decisão confirmada e fato editorial como registros distintos. A correção preserva o texto original. A consulta de encontros da Dora recupera trechos privados no escopo do usuário com referência de projeto, data, etapa e posição. O fluxo editorial copia apenas os fatos marcados para SEO/GEO. Não enviar automaticamente conversa privada a um provedor ou ao site do cliente. Registrar quem revisou e qual parte originou a decisão. Nesta versão a identidade é a do proprietário do encontro; não há identificação automática dos interlocutores.
+
+**Testes realizados.** FastAPI TestClient, base SQLite temporária e identidades de teste. Um WAV foi convertido em WebM/Opus, salvo, lido byte a byte e transcrito pelo modelo local real. Verificados 401 sem identidade, 403 para site indevido, 404 para outro usuário do mesmo site, rejeição de criação sem concordância, reenvio idêntico, conflito na mesma sequência, bloqueio da exclusão com transcrição pendente, idempotência das notas e recuperação de uma decisão pelo texto. A linha do tempo aceitou 180 partes de material repetido com posições até 59:40. Essa simulação exercita armazenamento e ordenação. Não comprova gravação física de uma hora, perda real de rede, qualidade do microfone no Safari, duração da bateria ou ausência de lacunas. Na validação de campo, testar desconexão/retorno, pausa, bloqueio de tela, permissão revogada, armazenamento local cheio e recarga com partes pendentes.
+
+**Publicação e investigação de recorrência.** Conferir SHA de merge no serviço Render. Um serviço live atesta o deploy. Só confirmar a jornada autenticada depois de gravar, reabrir o histórico, reproduzir um trecho, consultar sua origem e verificar o material editorial com uma conta autorizada. Se o botão de ditado funcionar e o de encontros não aparecer, conferir HTML e JS do mesmo deploy, o site escolhido e o escopo de sessão. Não aumentar a franquia do ditado curto para tentar convertê-lo em gravador de reunião.
+
+- [PR #249 e código](https://github.com/raphaelsousapereira/pandora-cloud/pull/249)
+- [Deploy do commit fa4cc24](https://dashboard.render.com/web/srv-dbmj0q6417fc73eobvtg/deploys/dep-dc0bp2btqb8s73daopag)
+- [Referência do navegador para dataavailable e atrasos de timeslice](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/dataavailable_event)
