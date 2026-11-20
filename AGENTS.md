@@ -1,0 +1,5 @@
+# Regra de trabalho PANDORA
+
+Antes de planejar, editar, diagnosticar ou publicar, abra MEMORIA.md na revisão atual da main. Leia as entradas sobre o sistema afetado e as falhas que tenham sintomas semelhantes. No início do registro de trabalho, cite a revisão consultada, os IDs aplicáveis e o primeiro teste que distingue as causas. Se nenhum caso corresponder, registre a busca e prossiga. Se não tiver acesso, indique a limitação e obtenha a cópia autorizada antes de afirmar que consultou o histórico.
+
+Ao encerrar, compare o resultado com a condição de aceite do usuário. Se houve descoberta, tentativa que falhou, correção ou nova evidência, acrescente uma entrada usando MODELO.md. Para um caso existente, acrescente uma retificação datada que cite seu ID. Preserve a sequência histórica. Inclua na entrega o link do commit da memória ou identifique a atualização pendente. Para trabalho rotineiro sem descoberta, registre no PR a justificativa curta. Revise comandos históricos antes de aplicá-los a outro serviço. Proteja credenciais, identificadores de clientes, áudio e transcrições privadas.
