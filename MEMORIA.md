@@ -90,3 +90,9 @@ Verificar status e variáveis antes de propor mais RAM, disco ou plano de worksp
 - [PR #249 e código](https://github.com/raphaelsousapereira/pandora-cloud/pull/249)
 - [Deploy do commit fa4cc24](https://dashboard.render.com/web/srv-dbmj0q6417fc73eobvtg/deploys/dep-dc0bp2btqb8s73daopag)
 - [Referência do navegador para dataavailable e atrasos de timeslice](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/dataavailable_event)
+
+### 2026-11-20 · ENCONTROS-2026-002 · Administração por cliente, inclusive sem site
+
+Na área Clientes e sites, abrir Encontros do cliente na linha da organização. A tela /admin/encontros?org=… valida platform_admin e a existência da organização, exibe o cliente e preenche o projeto. Reutiliza a captura, fila, transcrição e persistência do caso 001. Para consulta posterior, retornar pelo mesmo cliente com o mesmo administrador. A organização e o usuário formam o escopo dos registros administrativos, com site vazio. Não inventar site fictício para uma reunião de contrato, não inferir autorização por ID na URL e não combinar automaticamente os registros privados de usuários diferentes.
+
+Em SQLite temporária com identidades de teste: cliente sem site abriu a ficha; áudio WebM foi persistido e reproduzido byte a byte; Whisper real transcreveu e a consulta posterior recuperou o texto. Um usuário comum recebeu 403 e a consulta no escopo de site não encontrou o encontro administrativo. O teste não é uma sessão autenticada no portal publicado. [PR #250](https://github.com/raphaelsousapereira/pandora-cloud/pull/250).
