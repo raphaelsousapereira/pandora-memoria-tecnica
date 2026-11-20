@@ -113,3 +113,7 @@ Erro evitado: schema.sql histórico citava public.project_access; a inspeção d
 
 - [PANDORA Cloud PR 252](https://github.com/raphaelsousapereira/pandora-cloud/pull/252)
 - [Arquitetura PR 4](https://github.com/raphaelsousapereira/arquitetura-clientes-saas/pull/4)
+
+### ENCONTROS-2026-003 · Exportação e exclusão seletiva
+
+Ações em Áudio e transcrição: impressão do texto, cópia e TXT UTF-8 do encontro selecionado. Incluir horários, pendências e correções identificadas, separar do botão de copiar fatos editoriais. Ao trocar de encontro, invalidar a seleção carregada antes de exportar. Excluir só o blob solicitado, vinculando proprietário, encontro e sequência; preservar texto e notas. Validado em SQLite com duas reuniões e trecho pendente, usando dados de teste. Diálogo de impressão, clipboard e download em iPhone requerem verificação no dispositivo. [PR #259](https://github.com/raphaelsousapereira/pandora-cloud/pull/259).
