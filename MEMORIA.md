@@ -300,3 +300,7 @@ O merge Cloud v0.6 PR #267 (`6ca98559f9383f5e67bb38e5e5011113576eb81e`) e atuali
 ### 2026-11-21 · Retificação PAA-2026-001 — deploy concorrente concluído
 
 O deploy subsequente do Orquestrador `dep-dc0gmphit1ds73al4130`, commit `0c22c79ff88815687f02f208eb69bb3495c12a97` descendente do merge PAA, ficou **live** em 2026-11-21T03:12:14Z. Diff confirmou preservação do motor/plano e JS do PAA. Nova verificação do domínio após esse deploy: health 200 e ambos os JS com conteúdo idêntico ao commit PAA. Não houve sessão autenticada de cliente.
+
+### 2026-11-21 · Fechamento ORQUESTRADOR-2026-009 — Render Cloud live
+
+Render `srv-dbmj0q6417fc73f5k9o0` (atenção: este é um ID do workspace, não um ID de serviço; o serviço correto é `srv-dbmj0q6417fc73eobvtg`) confirmou deploy `dep-dc0gmphit1ds73al4130` no commit `0c22c79ff88815687f02f208eb69bb3495c12a97`, **live** em 2026-11-21T03:12:14Z. Health checks `GET /health` HTTP 200 às 03:12:18, :23, :27 e :28 UTC, sem Traceback/ERROR nos últimos logs consultados. O endpoint de aprovação da v0.7 e o painel administrativo estão publicados; o código é fail-closed, pois `PANDORA_ORCH_SELF_REPAIR_PR_ENABLED=0` e não há credencial GitHub App instalada para essa função. **Não houve criação de PR de reparo real, merge, deploy de alteração proposta ou escrita WordPress.** O piloto Negócio no Mapa permanece bloqueado devido aos dois registros de site. Próxima validação: registrar par de site correto, testar login/MFA real, consentimento e GitHub App OAuth com revisão humana do primeiro patch, sem liberar operações arbitrárias.
