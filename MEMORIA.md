@@ -308,3 +308,7 @@ Render `srv-dbmj0q6417fc73f5k9o0` (atenção: este é um ID do workspace, não u
 ### 2026-11-21 · Retificação VOZ-2026-001 — leitura local nos dois portais
 
 O leitor prioriza português brasileiro e vozes locais identificadas como premium ou aprimoradas. Segmenta frases antes do limite de comprimento. Testes simulados verificaram preferência local, primeira pausa e integridade do texto; qualidade acústica em iPhone ainda não aferida. Render confirmou live no Cloud (dep-dc0iedrtqb8s73dh8840, e5c5132) e portal de arquitetura (dep-dc0iefvv243c73b66740, 99e6251). Sem contratação de síntese ou serviço adicional.
+
+## 2026-11-21 · ANEXOS-2026-HTML · HTML e legendas na conversa da Dora
+
+Ampliados o seletor e o leitor local para HTML/HTM e legendas SRT/VTT. O texto HTML é extraído sem abrir links; as legendas preservam a referência temporal. PR https://github.com/raphaelsousapereira/pandora-cloud/pull/270. Anexos ativados no Render; deploy dep-dc0l0oqd217c73faer5g live no commit 18bbfb5. Incluídos testes de regressão. Execução Python e upload autenticado não verificados nesta sessão.
