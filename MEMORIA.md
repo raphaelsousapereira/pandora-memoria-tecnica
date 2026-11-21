@@ -167,3 +167,8 @@ Manter o catálogo no pacote Python e fornecer ao navegador os mesmos IDs usados
 - **Limites de verificação:** primeiro deploy do serviço live e logs Uvicorn, porém o endpoint /health não pôde ser verificado externamente pelo navegador de pesquisa. Não houve smoke autenticado com Postgres nem dois tenants; não afirmar homologação ponta a ponta.
 - **Próximos testes:** revisar/autorizar Blueprint, aplicar com fromDatabase sem segredos; confirmar produção/PG, reinício + persistência, credenciais escopadas por org/site e expiração; então testar ponte CLOUD com fixture e tenant real autorizado. Revisar deploy após atualização de env e logs.
 - **Fontes:** Render docs https://render.com/docs/blueprint-spec; [runbook staging](https://github.com/raphaelsousapereira/pandora-corpo/blob/main/deploy/ORCHESTRATOR_STAGING_README.md); [PR #263 Cloud](https://github.com/raphaelsousapereira/pandora-cloud/pull/263).
+
+
+### 2026-11-20 · Retificação de ORQUESTRADOR-2026-003 — dois deploys live confirmados
+
+Os dois deploys que estavam pendentes atingiram \`live\` no Render, com logs de inicialização Python. Pandora Cloud: \`dep-dc0ee5mk1f9s738sr3n0\`, commit \`6a0acb16b14f3db157afb97592fa33971ae91257\`, \`live\` em 2026-11-21 00:36:17 UTC; dois GET /health 200 nos logs após o processo iniciar. Orchestrator staging: \`dep-dc0eelfb9u1s73bft03g\`, commit \`ab6506184c0513233e376a7d95dab7a121d26571\`, \`live\` em 00:36:24 UTC. Isso confirma implantação dos serviços, **não** conexão PostgreSQL, nem autenticação de um tenant pela ponte, nem testes autenticados ponta a ponta. Render Blueprint \`exs-dc0een6k1f9s738ssu40\` continua apenas \`planned\`, não aprovado. A persistência atual do staging permanece SQLite descartável.
