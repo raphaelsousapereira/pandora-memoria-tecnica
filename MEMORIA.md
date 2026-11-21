@@ -250,3 +250,7 @@ Render Cloud em deploy \`dep-dc0fhcu43dis73dcbgr0\`, commit \`46c482e1422e173878
 - **Limite/risco:** sobreposição lexical **não prova verdade**; parecer de atribuição é suporte à revisão, sem score de confiança científica. Não ativar usuários reais; evitar fonte enviesada e duplicação de citações. Retificar esta entrada com status do Render quando comprovado.
 - **Próxima ocorrência:** testar API real com pares sintéticos, avaliar falsos positivos com corpus anotado por humanos antes de considerar motor semântico, verificar duplicidade do site piloto Cloud e consentimento específico.
 - **Links:** [PR #162](https://github.com/raphaelsousapereira/pandora-corpo/pull/162), [documentação v0.5](https://github.com/raphaelsousapereira/pandora-corpo/blob/main/packages/pandora_orchestrator/docs/EVIDENCE_EVALUATION_V050.md).
+
+### 2026-11-20 · ORQUESTRADOR-2026-007 — staging v0.5.0 live
+
+Render `srv-dc0ed6t9el5s73dro6og` confirmou deploy `dep-dc0g8760tbcc73b041n0` com commit `afe2037ca0b0a797bb9a5b2cf47d1560dcbb883b`, status **live**, finalizado em 2026-11-21T02:39:21Z. Logs registraram `Application startup complete`, `GET /health` 200 e URL `https://pandora-orchestrator-staging.onrender.com`. Confirma implantação operacional de v0.5.0, **não** comprova decisão semântica, fluxo autenticado da nova rota nem acurácia de respostas reais. Sem alteração de flags ou concessão a clientes. O piloto do Negócio no Mapa ainda possui dois registros Cloud e não foi liberado.
