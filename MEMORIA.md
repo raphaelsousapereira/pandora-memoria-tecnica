@@ -446,3 +446,13 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
   - Existem dois orquestradores: o do Cloud, que executa, e o serviço do `pandora-corpo` (durable executor/PostgreSQL), que o Cloud só consulta em leitura e com a liberação desligada.
 - **Correção sugerida (não aplicada):** trocar para `rest_api_write` (POST/PUT) e manter `rest_api` para GET. Exigir `rest_api_write` no `tools/list` e criar um teste de contrato com o schema real.
 - **Próxima ocorrência:** antes de ativar WordPress, rodar `tools/list` na conexão OAuth do SaaS e conferir o `inputSchema` de `rest_api` e `rest_api_write`.
+
+### 2026-11-22 · Correção ORQUESTRADOR-2026-015 — escritas por rest_api_write
+- **Commit:** `205194c` no PR raphaelsousapereira/pandora-cloud#284.
+- **Contrato:** `pandora_cloud/wpvibe_contract.py` escolhe `rest_api` para GET e `rest_api_write` para POST/PUT/DELETE, e valida os argumentos contra o `inputSchema` de `tools/list`. Se o contrato do WPVibe mudar, a chamada falha com 409 antes de sair.
+- **Onde foi aplicado:** edição exata do operador, rascunho da Factory e `WordPressExecutor.request` (stage, publicação e rollback). Este último guarda o catálogo por 5 min.
+- **Teste:** `tests/test_orchestrator_wpvibe_contract.py`, com fixture `tests/fixtures/wpvibe_rest_tools.json` copiado do schema do servidor MCP oficial em 2026-11-22.
+  - Cada chamada é validada com `jsonschema`, e o servidor falso recusa escrita em `rest_api`.
+  - No código antigo, 7 de 8 testes falham; no novo, a suíte do Orquestrador tem 203 aprovados.
+- **Limite:** não houve chamada real ao WPVibe, porque falta a conexão OAuth do SaaS e um site de homologação.
+- **Primeiro passo na ativação:** com a conexão OAuth do Studio Executiva, rodar `tools/list` e comparar os schemas de `rest_api` e `rest_api_write` com o fixture. Se divergirem, atualizar o fixture e o teste antes de ligar `PANDORA_ORCH_WEBSITE_DRAFT_ENABLED` ou `PANDORA_ORCH_WPVIBE_APPLY_ENABLED`.
