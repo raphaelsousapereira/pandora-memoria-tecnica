@@ -413,3 +413,16 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - CI local do branch: 10 jobs aprovados e 2 com falha, as duas também presentes no main:
   - `browser_workspace.py` já falhava antes da janela.
   - O audit `pandora-ux` exige o "Ícone visível nos atalhos de GEO Score e NAP" no Assistente, atalhos removidos em `0bde734` sem atualizar `scripts/ux_cloud_local.py`.
+
+### 2026-11-22 · Retificação DIAGNOSTICO-2026-001 — auditoria de UX e browser_workspace corrigidos
+- **Auditoria `pandora-ux`:** a regra "Ícone visível nos atalhos de GEO Score e NAP" (#254) mirava um `svg` com `aria-hidden="true"`. O `COLLECT` de `packages/pandora_ux/pandora_ux/visual.py` descarta esse elemento, então a regra nunca era medida e reprovava em 320 e 390 px.
+  - A captura mostrava os ícones na tela: o defeito era a medição, não a interface.
+  - Correção: PANDORA UX 1.5.0 com a opção `decorative: true` em regras `target` (padrão `false`), usada nos manifestos `cloud` e `cloud-cliente`.
+  - Recebe também a correção de `filter(visible)`, que passava o índice como segundo argumento.
+- **`browser_workspace.py`:**
+  - "Nova conversa" (`#as-new`) saiu do topo em `0bde734`; o teste agora recarrega a página, já que a conversa não é guardada.
+  - O menu do celular virou "Mais opções de navegação" em #254; o teste usa `#pc-menu`.
+  - Lacuna de produto em aberto: não há mais botão para começar outra conversa sem recarregar, e o handler de `#as-new` em `assistente-app.js` ficou sem uso.
+- **Commits:** `2637744` e `fc71ba5` no PR #284.
+- **CI local em `fc71ba5`:** 12 aprovados, 0 falhas, 6 pulados (caminhos não tocados).
+- **Próxima ocorrência:** se uma regra visual vier como "Nenhum conjunto completo de elementos visíveis foi medido" com o elemento aparecendo na captura, conferir `aria-hidden`, `hidden` e `inert` no seletor antes de mexer no CSS.
