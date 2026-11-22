@@ -387,3 +387,72 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - **Publicação real:** primeiro deploy do merge `dep-dc0sq2p5efls73egc0rg` **live** em 2026-11-21T16:57:30Z. Segundo deploy de configurações `dep-dc0sq859k2hc73duopdg` **live** em 2026-11-21T16:59:22Z com commit exato `8fcad65acb7fa33f7171f180c8a6070863c500c9`, logs `Application startup complete`, `GET /health` HTTP 200 repetidos e URL primária `https://app.geoaicitations.com`. Isso confirma bootstrap, não autorização individual concluída.
 - **Limites e próxima ocorrência:** abrir `/admin/orquestrador/capacidades`, selecionar site que possua consentimento audit e conste da allowlist Render, escrever justificativa e autorizar individualmente cada nativo gratuito; testar resposta autenticada e execução controlada. O domínio `seonegocionomapa.com.br` permanece duplicado (`site_count=2`, `unique_site=false`, `consent_ready=false` nos logs) e não deve ser eleito sem confirmação do registro correto. Se houver regressão, revisar o PR #282 e status/erros no Render; reverter flag somente mediante revisão das implicações de política.
 - **Referências:** [PR #282](https://github.com/raphaelsousapereira/pandora-cloud/pull/282), [manual](https://github.com/raphaelsousapereira/pandora-cloud/blob/main/docs/ORCHESTRATOR_CAPABILITY_REGISTRY_V100.md), [deploy Render live](https://dashboard.render.com/web/srv-dbmj0q6417fc73eobvtg/deploys/dep-dc0sq859k2hc73duopdg).
+
+## 2026-11-22 · DIAGNOSTICO-2026-001 · Testes do main não rodavam e três regressões chegaram ao Render
+
+- **Projeto, componente, ambiente, revisão e fuso horário:** `pandora-cloud` main `1823931` (Render `dep-dc0tguu7bikc739rife0` live com esse commit), `pandora-corpo` main `c015489`; janela 2026-11-20 02:00 UTC → 2026-11-22 02:00 UTC; horários em UTC.
+- **Pedido e critério observável de aceite:** diagnóstico técnico dos avanços no main das últimas 48 h, apontando falhas e lacunas com evidência reproduzível.
+- **Memória consultada antes da mudança (commit e IDs):** `MEMORIA.md@74f5723`; ORQUESTRADOR-2026-005…014, PAA-2026-001, VOZ-2026-001. Primeiro teste distintivo: `python tools/ci_local.py` no main e, para cada falha, o mesmo teste no commit anterior à janela (`2b454de`).
+- **Sintoma, ponto de reprodução, comportamento esperado e observado:** as entradas 010–014 registram "suíte completa não executada"; todos os runs do GitHub Actions no main falham em cerca de 3 s, antes das etapas. Rodando o CI local: unittest (1104 s), PAA, biblioteca, imprensa e grafismo foram aprovados; os testes de navegador falharam.
+- **Causa demonstrada, evidência e causas ainda incertas:**
+  1. `44e8931`/`a9c21bb` (#246, planos): removido o desvio que deixava o administrador incluir site extra em org Premium. `MAX_SITES[cliente]=1` agora vale para todos. Oito testes de navegador quebram com `Conflict: O plano desta conta cobre 1 site(s)` (visibility_weekly, plugins, velocidade, entidade, youtube, enderecos, integracoes). Todos passavam em `2b454de`. Em produção, org Premium com mais de um site não ganha site novo nem pelo administrador.
+  2. #277/#278 (Ajuda no login): a regra `@media(max-width:600px){body:has(input:focus) .lg-ajuda{position:static…}}` muda o layout no foco. O clique em "Entrar com link" é perdido e `tests/browser_login.py` falha de forma determinística. Sem essa linha, o teste passa. Passava em `2b454de`.
+  3. Nove dos 13 arquivos `tests/test_orchestrator_*.py` (106 funções pytest) não rodam no CI: `unittest discover` ignora funções pytest, e o passo pytest do `ci.yml` lista só 4 arquivos. Ao rodar todos, há 192 aprovados e 3 falhas: `test_orchestrator_bridge::test_revoked_audit_never_reaches_orchestrator`, que espera 403 enquanto a rota devolve 200 com `connected:false` (sem chamada remota, teste desatualizado), e dois de `test_orchestrator_operator` (rotas autorizar/revogar), com o dublê SQLite sem `check_same_thread=False`. As rotas de autorização do #282 seguem sem teste executável.
+  4. Plano `personalizado` (#246) é tratado como não-Premium em `escriba_jobs._full_allowed` (`== plans.CLIENT`) e na tela de consentimento OAuth (`mcp_remote_routes.py:76`).
+  5. Já existia antes da janela: `tests/browser_workspace.py` também falha em `2b454de` (timeout em `#as-new`, botão removido/realocado).
+- **Cobertura real, simulações, falhas de ambiente e limites da conclusão:** pip-audit (requirements.txt e locks do forge) não encontrou vulnerabilidades. As falhas de axe/pip-audit no primeiro `--sem-instalar` foram de ambiente. axe-core passou depois de instalado. Pacote `pandora-corpo/packages/pandora_orchestrator`: 114 testes aprovados, mas nenhum workflow do corpo os executa. Não houve login real, MFA, nem consulta a logs Render (workspace Render não selecionado nesta sessão).
+- **Lacunas de processo:** 22 commits empurrados direto no main do Cloud sem PR, o que contraria a regra de CI local do `CLAUDE.md`. Sem entrada de memória para #277/#278/#280/#283, Facets e corpo #163 (worker editorial que publica no WordPress com `status=publish` quando GEO ≥ 950, sem revisão humana do texto). `PANDORA_ORCH_TOOL_APPROVALS_REQUIRED` tem padrão `0` no código (fail-open), mitigado só pela variável no Render.
+- **Próxima ocorrência:** antes de merge, rode `PANDORA_CHROMIUM=<chrome> python tools/ci_local.py` e `python -m pytest tests/test_orchestrator_*.py`. Se um teste de navegador falhar com `Conflict` de plano, conferir `core.create_site` e `MAX_SITES`.
+
+### 2026-11-22 · Retificação DIAGNOSTICO-2026-001 — limite de sites era intencional; correções 1 e 2
+- O item 1 não era regressão do código: `test_planos.test_um_site_por_plano` registra que "administrador também respeita o limite contratado" (#246). Os sete testes de navegador estavam desatualizados e agora usam o plano `personalizado`. Org Premium real com mais de um site precisa trocar de plano.
+- Commits em `pandora-cloud` no branch `claude/main-technical-diagnosis-psy4k9`:
+  - `b6f6887`: a Ajuda do login fica `visibility:hidden` no foco, sem sair de `position:fixed`.
+  - `31765ec`: os testes de navegador com vários sites usam o plano `personalizado`.
+  - `39b7c1e`: o CI roda `pytest tests/test_orchestrator_*.py` (195 aprovados), corrige os 3 testes e ganha a guarda `tests/test_cobertura_pytest.py`.
+- CI local do branch: 10 jobs aprovados e 2 com falha, as duas também presentes no main:
+  - `browser_workspace.py` já falhava antes da janela.
+  - O audit `pandora-ux` exige o "Ícone visível nos atalhos de GEO Score e NAP" no Assistente, atalhos removidos em `0bde734` sem atualizar `scripts/ux_cloud_local.py`.
+
+### 2026-11-22 · Retificação DIAGNOSTICO-2026-001 — auditoria de UX e browser_workspace corrigidos
+- **Auditoria `pandora-ux`:** a regra "Ícone visível nos atalhos de GEO Score e NAP" (#254) mirava um `svg` com `aria-hidden="true"`. O `COLLECT` de `packages/pandora_ux/pandora_ux/visual.py` descarta esse elemento, então a regra nunca era medida e reprovava em 320 e 390 px.
+  - A captura mostrava os ícones na tela: o defeito era a medição, não a interface.
+  - Correção: PANDORA UX 1.5.0 com a opção `decorative: true` em regras `target` (padrão `false`), usada nos manifestos `cloud` e `cloud-cliente`.
+  - Recebe também a correção de `filter(visible)`, que passava o índice como segundo argumento.
+- **`browser_workspace.py`:**
+  - "Nova conversa" (`#as-new`) saiu do topo em `0bde734`; o teste agora recarrega a página, já que a conversa não é guardada.
+  - O menu do celular virou "Mais opções de navegação" em #254; o teste usa `#pc-menu`.
+  - Lacuna de produto em aberto: não há mais botão para começar outra conversa sem recarregar, e o handler de `#as-new` em `assistente-app.js` ficou sem uso.
+- **Commits:** `2637744` e `fc71ba5` no PR #284.
+- **CI local em `fc71ba5`:** 12 aprovados, 0 falhas, 6 pulados (caminhos não tocados).
+- **Próxima ocorrência:** se uma regra visual vier como "Nenhum conjunto completo de elementos visíveis foi medido" com o elemento aparecendo na captura, conferir `aria-hidden`, `hidden` e `inert` no seletor antes de mexer no CSS.
+
+## 2026-11-22 · ORQUESTRADOR-2026-015 · Auditoria: escrita no WordPress usa ferramenta só de leitura
+
+- **Projeto, componente, ambiente, revisão:** `pandora-cloud` main `1823931` (Render live); `orchestrator_operator_wpvibe.py`, `orchestrator_website_factory_wpvibe.py`, `orchestrator_website_wordpress.py`.
+- **Pedido:** auditar o Orquestrador, avaliar se a fábrica de agentes valeu a pena e o que falta para funcionar agora.
+- **Memória consultada:** ORQUESTRADOR-2026-001…014, DIAGNOSTICO-2026-001.
+- **Causa demonstrada:** os três adaptadores de escrita chamam a ferramenta MCP `rest_api` com `method` POST/PUT. O contrato atual do WPVibe diz que `rest_api` é GET-only e que POST, PUT e DELETE vão por `rest_api_write`.
+  - Afeta: criar rascunho (Factory), aplicar edição exata (operador), stage, publicação e rollback (release v2).
+  - Os testes usam dublês e nunca exercitaram o schema real. A pendência "homologar tool schema" de ORQUESTRADOR-2026-008 se confirma como bloqueio.
+- **Estado operacional:**
+  - Flags: `OPERATOR_ENABLED=1`, `TOOL_APPROVALS_REQUIRED=1`, allowlist de pares vazia, `REAL_TENANTS=0`, WPVibe, rascunho, release e self-repair em 0.
+  - O piloto `seonegocionomapa.com.br` tem 2 cadastros (`consent_ready=false`).
+  - Nenhuma execução real de cliente aconteceu.
+- **Outras constatações:**
+  - O Studio é determinístico: escolhe ferramentas por palavras-chave e as mensagens não têm interpretação por IA.
+  - A hierarquia 10×10 tem 100 vagas, das quais só 9 têm um motor nativo.
+  - Os jobs rodam em threads dentro de 1 instância com SQLite em disco de 1 GB: um deploy interrompe a execução (mesmo mecanismo do PAA-2026-001).
+  - Existem dois orquestradores: o do Cloud, que executa, e o serviço do `pandora-corpo` (durable executor/PostgreSQL), que o Cloud só consulta em leitura e com a liberação desligada.
+- **Correção sugerida (não aplicada):** trocar para `rest_api_write` (POST/PUT) e manter `rest_api` para GET. Exigir `rest_api_write` no `tools/list` e criar um teste de contrato com o schema real.
+- **Próxima ocorrência:** antes de ativar WordPress, rodar `tools/list` na conexão OAuth do SaaS e conferir o `inputSchema` de `rest_api` e `rest_api_write`.
+
+### 2026-11-22 · Correção ORQUESTRADOR-2026-015 — escritas por rest_api_write
+- **Commit:** `205194c` no PR raphaelsousapereira/pandora-cloud#284.
+- **Contrato:** `pandora_cloud/wpvibe_contract.py` escolhe `rest_api` para GET e `rest_api_write` para POST/PUT/DELETE, e valida os argumentos contra o `inputSchema` de `tools/list`. Se o contrato do WPVibe mudar, a chamada falha com 409 antes de sair.
+- **Onde foi aplicado:** edição exata do operador, rascunho da Factory e `WordPressExecutor.request` (stage, publicação e rollback). Este último guarda o catálogo por 5 min.
+- **Teste:** `tests/test_orchestrator_wpvibe_contract.py`, com fixture `tests/fixtures/wpvibe_rest_tools.json` copiado do schema do servidor MCP oficial em 2026-11-22.
+  - Cada chamada é validada com `jsonschema`, e o servidor falso recusa escrita em `rest_api`.
+  - No código antigo, 7 de 8 testes falham; no novo, a suíte do Orquestrador tem 203 aprovados.
+- **Limite:** não houve chamada real ao WPVibe, porque falta a conexão OAuth do SaaS e um site de homologação.
+- **Primeiro passo na ativação:** com a conexão OAuth do Studio Executiva, rodar `tools/list` e comparar os schemas de `rest_api` e `rest_api_write` com o fixture. Se divergirem, atualizar o fixture e o teste antes de ligar `PANDORA_ORCH_WEBSITE_DRAFT_ENABLED` ou `PANDORA_ORCH_WPVIBE_APPLY_ENABLED`.
