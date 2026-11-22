@@ -456,3 +456,19 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
   - No código antigo, 7 de 8 testes falham; no novo, a suíte do Orquestrador tem 203 aprovados.
 - **Limite:** não houve chamada real ao WPVibe, porque falta a conexão OAuth do SaaS e um site de homologação.
 - **Primeiro passo na ativação:** com a conexão OAuth do Studio Executiva, rodar `tools/list` e comparar os schemas de `rest_api` e `rest_api_write` com o fixture. Se divergirem, atualizar o fixture e o teste antes de ligar `PANDORA_ORCH_WEBSITE_DRAFT_ENABLED` ou `PANDORA_ORCH_WPVIBE_APPLY_ENABLED`.
+
+## 2026-11-22 · RRF-2026-001 · RRF Fusion sem PDF e sem orientação para o administrador
+
+- **Projeto e componente:** pandora-cloud, `/admin/rrf-fusion` (`rrf_discovery_shadow.py`, `rrf_fusion_ui.py`, `static/rrf-fusion.js`). Branch `claude/pandora-rrf-fusion-pdf-report-4sodrw`, commit `4fdc078`.
+- **Pedido e aceite:** depois de uma auditoria do termo "geo ai citations", o administrador recebeu uma tabela de posições e pontuações RRF e não sabia o que fazer com ela. Também não havia PDF. Aceite: a tela e um PDF dizem o que os dados mostram e o que fazer.
+- **Memória consultada:** revisão `862edbd`. Busca por RRF, PDF e relatório. Nenhum caso de RRF. O padrão de PDF da marca vem do `pdf_marca.Report`, citado em PAA-2026-001.
+- **Causa:** o preview devolvia só números (`score`, `ranks`). O motor Discovery tira o próprio site dos candidatos, então a posição do cliente nunca aparecia. Ela já estava gravada em `discovery_serps`, pela coleta Serper, mas ninguém a lia.
+- **Correção:** novo `pandora_cloud/rrf_report.py`.
+  - `interpret` gera o resumo, as leituras (líderes presentes em todas as listas, força só no Maps ou só no orgânico, listas sem sobreposição), a posição do cliente lida em `studio.rankings` para o mesmo termo e um plano de ação.
+  - `pdf` monta o relatório com `pdf_marca.Report`.
+  - Novas rotas `GET .../rrf-captured-report.pdf` e `POST .../rrf-report.pdf`, com as mesmas travas: administrador e `PANDORA_RRF_SHADOW_ENABLED=1`.
+  - A comparação das capturas agora lista todos os candidatos (`top_n=100`).
+  - Sem coleta gravada do termo, o texto **não** afirma a posição do cliente e manda coletar.
+- **Verificação:** `tests/test_rrf_report.py` (6) e as suítes `test_rrf_*` e `test_serp_collector`: 53 OK. O PDF de exemplo foi renderizado e conferido visualmente.
+- **Não verificado:** a jornada autenticada no Render com dados reais e o deploy.
+- **Próxima ocorrência:** se a tela disser que a posição do site não é conhecida, comparar o termo gravado em `discovery_serps.query` com `result.query`. A comparação ignora maiúsculas e espaços extras, mas não acentos.
