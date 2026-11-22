@@ -426,3 +426,23 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - **Commits:** `2637744` e `fc71ba5` no PR #284.
 - **CI local em `fc71ba5`:** 12 aprovados, 0 falhas, 6 pulados (caminhos não tocados).
 - **Próxima ocorrência:** se uma regra visual vier como "Nenhum conjunto completo de elementos visíveis foi medido" com o elemento aparecendo na captura, conferir `aria-hidden`, `hidden` e `inert` no seletor antes de mexer no CSS.
+
+## 2026-11-22 · ORQUESTRADOR-2026-015 · Auditoria: escrita no WordPress usa ferramenta só de leitura
+
+- **Projeto, componente, ambiente, revisão:** `pandora-cloud` main `1823931` (Render live); `orchestrator_operator_wpvibe.py`, `orchestrator_website_factory_wpvibe.py`, `orchestrator_website_wordpress.py`.
+- **Pedido:** auditar o Orquestrador, avaliar se a fábrica de agentes valeu a pena e o que falta para funcionar agora.
+- **Memória consultada:** ORQUESTRADOR-2026-001…014, DIAGNOSTICO-2026-001.
+- **Causa demonstrada:** os três adaptadores de escrita chamam a ferramenta MCP `rest_api` com `method` POST/PUT. O contrato atual do WPVibe diz que `rest_api` é GET-only e que POST, PUT e DELETE vão por `rest_api_write`.
+  - Afeta: criar rascunho (Factory), aplicar edição exata (operador), stage, publicação e rollback (release v2).
+  - Os testes usam dublês e nunca exercitaram o schema real. A pendência "homologar tool schema" de ORQUESTRADOR-2026-008 se confirma como bloqueio.
+- **Estado operacional:**
+  - Flags: `OPERATOR_ENABLED=1`, `TOOL_APPROVALS_REQUIRED=1`, allowlist de pares vazia, `REAL_TENANTS=0`, WPVibe, rascunho, release e self-repair em 0.
+  - O piloto `seonegocionomapa.com.br` tem 2 cadastros (`consent_ready=false`).
+  - Nenhuma execução real de cliente aconteceu.
+- **Outras constatações:**
+  - O Studio é determinístico: escolhe ferramentas por palavras-chave e as mensagens não têm interpretação por IA.
+  - A hierarquia 10×10 tem 100 vagas, das quais só 9 têm um motor nativo.
+  - Os jobs rodam em threads dentro de 1 instância com SQLite em disco de 1 GB: um deploy interrompe a execução (mesmo mecanismo do PAA-2026-001).
+  - Existem dois orquestradores: o do Cloud, que executa, e o serviço do `pandora-corpo` (durable executor/PostgreSQL), que o Cloud só consulta em leitura e com a liberação desligada.
+- **Correção sugerida (não aplicada):** trocar para `rest_api_write` (POST/PUT) e manter `rest_api` para GET. Exigir `rest_api_write` no `tools/list` e criar um teste de contrato com o schema real.
+- **Próxima ocorrência:** antes de ativar WordPress, rodar `tools/list` na conexão OAuth do SaaS e conferir o `inputSchema` de `rest_api` e `rest_api_write`.
