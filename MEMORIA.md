@@ -401,3 +401,13 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - **Decisão editorial:** diferente do estudo de decoração (nomes anonimizados), aqui as imobiliárias foram nomeadas porque o pedido era explicar o que cada uma faz melhor; só fatos públicos, com limites declarados. A ficha da TerraSul usa palavras-chave no nome (proibido pelas diretrizes do Google): citado como efeito observado, com aviso de não copiar.
 - **Limites:** 1 IA, 1 pergunta, 13 respostas; correlação, não causa. GEO Score sobre 8 páginas; contagem de palavras só na página inicial.
 - **Próxima ocorrência:** para GEO Score em ambiente com proxy, usar o wrapper de transporte (ou implementar no motor uma opção explícita de proxy, que hoje não existe; a v3.2 do Discovery tem `--no-dns-pinning`, o KG não). Para Condotta-like, registrar "não medido por robots" em vez de nota zero.
+
+## 2026-11-22 · GEO-SAUDE-2026-001 · GEO Score Saúde: 403 no robots.txt para robô identificado e gate de 8 não atingido
+
+- **Projeto/revisão:** `pandora-corpo` branch `claude/artigos-estudo-decodificacao-o5jk9x`, commit `e431d7c` (`engine/PANDORA_HEALTH_SCORE.py`, `tools/collect_health_edition.py`, `docs/GEO_SCORE_SAUDE_BRASIL.md`, `estudos/geo-score-saude-2026-11/`). Rascunho anterior: `pandora-cloud` branch `feat/geo-saude-runtime-20261119` (PR #233).
+- **Pedido:** índice de planos de saúde com o rigor de Bancos e Seguros, auditando critérios e usando mais ferramentas.
+- **Memória consultada:** `0d76151` (EDITORIAL-2026-001: transporte via proxy). Primeiro teste: robots.txt de cada alvo com o UA identificado.
+- **Descobertas:** 5 de 12 sites (Hapvida, NotreDame, Amil, Seguros Unimed, Unimed Curitiba) respondem 403 já no `robots.txt` ao UA `PANDORA-Health-Research/0.1`; com curl padrão alguns dão 200 — não trocar UA (protocolo; o classificador também bloqueia). Unimed POA: robots de `www.unimed.coop.br` redireciona para outro host → sem medida. SulAmérica: `/saude` redireciona para http; usar `/saude/`. Unimed-BH: <100 palavras sem JS.
+- **Critérios corrigidos:** "hospitalar" isolado dava falso positivo (rede hospitalar); PANDORA POLÍTICAS perfil `saude` é de clínica e deu 0 à Porto → fora; PageSpeed sem chave → 429 (usuário recusou chave) → velocidade sem medida, só peso de página no Chromium.
+- **Resultado:** 5 elegíveis (SulAmérica 618,3; Prevent 573,3; Unimed Nacional 483,3; Porto 473,3; Bradesco 456,7); Porto e Unimed Nacional trocam com pesos iguais. Gate ≥8 não atingido → não publicar ranking setorial.
+- **Próxima ocorrência:** rodar `python tools/collect_health_edition.py --out <dir>` sem `--via-proxy` a partir de conexão brasileira antes de concluir bloqueio por UA.
