@@ -403,3 +403,13 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - **Cobertura real, simulações, falhas de ambiente e limites da conclusão:** pip-audit (requirements.txt e locks do forge) não encontrou vulnerabilidades. As falhas de axe/pip-audit no primeiro `--sem-instalar` foram de ambiente. axe-core passou depois de instalado. Pacote `pandora-corpo/packages/pandora_orchestrator`: 114 testes aprovados, mas nenhum workflow do corpo os executa. Não houve login real, MFA, nem consulta a logs Render (workspace Render não selecionado nesta sessão).
 - **Lacunas de processo:** 22 commits empurrados direto no main do Cloud sem PR, o que contraria a regra de CI local do `CLAUDE.md`. Sem entrada de memória para #277/#278/#280/#283, Facets e corpo #163 (worker editorial que publica no WordPress com `status=publish` quando GEO ≥ 950, sem revisão humana do texto). `PANDORA_ORCH_TOOL_APPROVALS_REQUIRED` tem padrão `0` no código (fail-open), mitigado só pela variável no Render.
 - **Próxima ocorrência:** antes de merge, rode `PANDORA_CHROMIUM=<chrome> python tools/ci_local.py` e `python -m pytest tests/test_orchestrator_*.py`. Se um teste de navegador falhar com `Conflict` de plano, conferir `core.create_site` e `MAX_SITES`.
+
+### 2026-11-22 · Retificação DIAGNOSTICO-2026-001 — limite de sites era intencional; correções 1 e 2
+- O item 1 não era regressão do código: `test_planos.test_um_site_por_plano` registra que "administrador também respeita o limite contratado" (#246). Os sete testes de navegador estavam desatualizados e agora usam o plano `personalizado`. Org Premium real com mais de um site precisa trocar de plano.
+- Commits em `pandora-cloud` no branch `claude/main-technical-diagnosis-psy4k9`:
+  - `b6f6887`: a Ajuda do login fica `visibility:hidden` no foco, sem sair de `position:fixed`.
+  - `31765ec`: os testes de navegador com vários sites usam o plano `personalizado`.
+  - `39b7c1e`: o CI roda `pytest tests/test_orchestrator_*.py` (195 aprovados), corrige os 3 testes e ganha a guarda `tests/test_cobertura_pytest.py`.
+- CI local do branch: 10 jobs aprovados e 2 com falha, as duas também presentes no main:
+  - `browser_workspace.py` já falhava antes da janela.
+  - O audit `pandora-ux` exige o "Ícone visível nos atalhos de GEO Score e NAP" no Assistente, atalhos removidos em `0bde734` sem atualizar `scripts/ux_cloud_local.py`.
