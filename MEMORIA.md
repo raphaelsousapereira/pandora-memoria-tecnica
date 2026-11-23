@@ -456,3 +456,14 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
   - No código antigo, 7 de 8 testes falham; no novo, a suíte do Orquestrador tem 203 aprovados.
 - **Limite:** não houve chamada real ao WPVibe, porque falta a conexão OAuth do SaaS e um site de homologação.
 - **Primeiro passo na ativação:** com a conexão OAuth do Studio Executiva, rodar `tools/list` e comparar os schemas de `rest_api` e `rest_api_write` com o fixture. Se divergirem, atualizar o fixture e o teste antes de ligar `PANDORA_ORCH_WEBSITE_DRAFT_ENABLED` ou `PANDORA_ORCH_WPVIBE_APPLY_ENABLED`.
+
+## 2026-11-23 · ORQUESTRADOR-2026-016 · Regra do administrador ligada, mas nenhum site selecionado; execução presa ao processo web
+
+- **Projeto, componente, ambiente, revisão:** `pandora-cloud` main `2c3e8cd` (#289), Render `srv-dbmj0q6417fc73eobvtg` deploy `dep-dc1obl9ksfps739f3s8g` live em 2026-11-23T00:18Z (UTC).
+- **Pedido:** saber se o Orquestrador já funciona, autorizar as ferramentas, avaliar se ficar dentro do SaaS o limitou e planejar a evolução.
+- **Memória consultada:** `MEMORIA.md@862edbd`, ORQUESTRADOR-2026-005…015, DIAGNOSTICO-2026-001. Primeiro teste: ler `ORCH_PILOT_READINESS` no log do deploy live.
+- **Observado:** `admin_audit_rule: true` (era `false` no deploy das 22:53Z), `operator_selected_count: 0`, `site_count: 2`, `consented_active_count: 0`. Pelo código (`domain_pair_allowed`), zero selecionados significa `PANDORA_ORCH_OPERATOR_ALLOWED_DOMAINS` sem o host OU os dois cadastros com o mesmo host exato. O Render MCP não mostra valores de variáveis; causa entre as duas **não determinada**.
+- **Autorização de ferramentas não feita:** `authorize_native` chama `guard(execute=True)`, que exige `pair_allowed`; com zero selecionados devolve 403. Além disso exige sessão de administrador com MFA, que o agente não tem e não deve contornar.
+- **Arquitetura confirmada:** execução por `BackgroundTasks` no processo web (`agent_runtime.py:437`, `orchestrator_operator_routes.py:107`, `orchestrator_studio_routes.py:104`), 1 instância; os motores usam o SQLite do Cloud (`cloud._tx()`), e disco do Render não é compartilhável — um worker em outro serviço não enxerga o banco. O executor durável do corpo (v0.4.0) não tem worker contínuo e não é usado. Studio planeja por palavras-chave (`orchestrator_studio.py:52-54`). Dos 9 motores, só `discovery` tem custo (Serper).
+- **Entrega:** plano em fases `docs/ORCHESTRATOR_PLANO_EVOLUCAO.md` no branch `claude/orquestrado-status-s74q8a` do `pandora-cloud` (Fase 0 execução real; 1 execução durável; 2 supervisor com IA via `ai_gateway`; 3 escrita WordPress; 4 agentes como configuração versionada; 5 avaliação contínua). Nenhuma variável, flag ou dado alterado.
+- **Próxima ocorrência:** antes de autorizar ferramentas, confirmar `operator_selected_count: 1` no log de inicialização; se 0, conferir a variável de domínios e o host exato dos dois cadastros via `/api/admin/orquestrador/piloto`.
