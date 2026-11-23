@@ -479,3 +479,10 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - Publicada por pedido explícito do dono em https://geoaicitations.com/fundador/ (WP ID 791), pelo WPVibe `rest_api_write` (não pelo executor, que não alcança 95). GEO na página real: **78,8** (offline v2+JSON-LD dava 71,6; o rodapé real do tema somou NAP e E-E-A-T).
 - Armadilhas do tema Page Builder Framework: imprime `entry-title` como 2º H1 se a página não tiver `wpbf_options=["remove-title"]`; o Yoast não usa o resumo como meta description, é preciso gravar `_yoast_wpseo_metadesc` (e `_yoast_wpseo_title` se o título + sufixo passar de 65), com `--force` no WP-CLI do WPVibe.
 - Evidência: `pandora-corpo` `clientes/_proprios/geoaicitations.com/fundador-v2/geo-publicada.json` e `publicada-2026-11-23.html`.
+
+### 2026-11-23 · Evolução EDITORIAL-2026-001 — avaliação no layout real (opção a)
+- **Commit:** `pandora-corpo` `092997e`. `site_shell` + `shell_document` em `tools/pandora_page_mission.py`; opção `--modelo`; `layout.json` na saída; relatório com `evaluation_mode: offline_prepublication_shell`.
+- **Armadilha encontrada:** o `content.rendered` da API não aparece idêntico no HTML servido (um filtro de front-end acrescenta `sameAs`/ORCID no JSON-LD de `/sobre/`). Localizar pelo começo e fim (300 caracteres, ocorrência única, tamanho 0,5–1,5×) funcionou em 4/4 páginas do site. O título da API vem com entidades HTML: decodificar antes de substituir.
+- **Calibração:** página publicada medida no layout de `/sobre/` e `/servicos/` = 77,8; real = 78,8; fragmento = 54,3.
+- **Ainda não feito:** JSON-LD pelo executor (o `bleach` remove `<script>`), corte de 95 continua; com o layout real, uma página nova sem JSON-LD tirou 67,6.
+- **Próxima ocorrência:** se `layout.json` disser "Layout real indisponível", conferir se a API `/wp-json/wp/v2/pages` é pública e se o tema não reescreve o começo do conteúdo.
