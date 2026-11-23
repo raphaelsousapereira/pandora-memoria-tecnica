@@ -466,3 +466,26 @@ O [PR #296](https://github.com/raphaelsousapereira/pandora-cloud/pull/296) reapr
 ### 2026-11-23 · Retificação PAA-2026-001 — correção publicada no Render
 
 Com autorização de publicação, o PR #296 foi integrado à main em `7143849391657e7b6a592e152a1aafcdfad6db1b`. A memória consultada foi `061ebf96a955a36fb81e1db8d8424fd17fbc4711`. O GitHub Actions não iniciou a avaliação por limite de orçamento. A publicação usou a verificação local anterior, incluindo regressões do assistente e avaliação por família, e a comparação dos quatro arquivos do PR com o merge. O deploy automático [dep-dc25bjl9el5s73bf61gg](https://dashboard.render.com/web/srv-dbmj0q6417fc73eobvtg/deploys/dep-dc25bjl9el5s73bf61gg) ficou live às 12h05, horário de Brasília. O domínio publicado respondeu HTTP 200 em /health e HTTP 401 em /api/admin/paa sem sessão. A primeira consulta aos logs após a ativação retornou zero erros de aplicação. O navegador abriu a tela de login, então uma nova rodada autenticada em produção segue pendente.
+
+## 2026-11-23 · AJUDA-2026-001 · vídeos de ensino nas ferramentas bloqueados pela CSP
+
+- **Projeto, componente e revisão:** PANDORA Cloud, ajuda das ferramentas (`pandora_cloud/aprenda.py`, `static/aprenda-mais.js`/`.css`, middleware `SecurityHeaders` em `portal.py`). Base `7143849`, branch `claude/aprenda-mais-videos-block-19ed0l`. Fuso: UTC.
+- **Pedido e aceite:** bloco "Aprenda mais" dentro das ferramentas com vídeos de ensino hospedados no YouTube como não listados. A capa deve mostrar a imagem do vídeo, e não apenas um botão.
+- **Memória consultada:** `912c1a6`. Não havia caso sobre vídeo incorporado. VIDEO-2026-001 se aplica parcialmente: manter JS/CSS fora do HTML por causa da CSP.
+- **Sintoma e causa:** `brand.csp()` começa com `default-src 'none'` e não tem `frame-src`/`media-src`, então qualquer iframe do YouTube é bloqueado. O portal também envia `Referrer-Policy: no-referrer`, e o player do YouTube recusa tocar sem a origem. Por fim, a ajuda existente (`tool_help.py`) só aceitava a ferramenta `schema`.
+- **Armadilha evitada:** várias rotas acrescentam `; frame-src 'self'` à CSP. Se `csp()` passasse a declarar um `frame-src` próprio, o navegador usaria só a primeira diretiva e as prévias em iframe dessas rotas quebrariam. Por isso a liberação **funde** origens na diretiva existente (ou herda de `default-src`), e só nas páginas com vídeo cadastrado.
+- **Correção:**
+  - O catálogo `help_content/aprenda.pt-BR.json` mapeia o caminho da página para os IDs do YouTube.
+  - O middleware injeta o script e soma `https://www.youtube-nocookie.com` (frame-src) e `https://i.ytimg.com` (img-src) apenas nesses caminhos.
+  - O player é criado só depois do clique, com `referrerpolicy="strict-origin-when-cross-origin"`.
+  - A miniatura carrega sem `loading=lazy`, porque o bloco fica abaixo da dobra e saía vazio. Uma imagem com `naturalWidth <= 120` (o marcador cinza que o YouTube devolve para ID inexistente) é removida.
+  - Um catálogo inválido é ignorado e registrado no log, sem derrubar a ferramenta.
+- **Verificação:**
+  - `tests/test_aprenda.py`: 9 testes cobrindo validação, fusão da CSP e página com e sem vídeo.
+  - `tests/browser_aprenda.py`: desktop e celular, sem rede. Confere a miniatura servida localmente, que nada do player é baixado antes do clique, o iframe e o referrer, a ausência de violação de CSP e que o bloco recolhido é lembrado.
+  - Captura manual com `i.ytimg.com` real mostrou a miniatura nas duas larguras.
+- **Limites:**
+  - Nenhum vídeo real foi cadastrado, e o catálogo publicado está vazio, porque os IDs dependem do operador.
+  - A reprodução real dentro do iframe não foi testada, porque o teste aborta a rede de fora.
+  - Páginas cuja CSP não permite `'self'` não recebem o bloco.
+- **Próxima ocorrência:** se o vídeo não tocar, abra o console e procure "Refused to frame" (CSP) ou o erro 153 do YouTube (referrer). Confira o cabeçalho com `curl -I` na página da ferramenta e veja se o caminho está no catálogo.
