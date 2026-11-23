@@ -473,3 +473,9 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - Log 2026-11-23T03:47:20Z: `admin_audit_rule: true`, `operator_selected_count: 0`, `site_count: 2`. Hipótese "variável vazia" descartada.
 - Causas restantes (o código só distingue olhando a URL gravada de cada cadastro): (a) os dois cadastros têm o mesmo host exato; (b) ambos usam `www.` e nenhum bate com o host listado; (c) o cadastro que bate tem revogação de auditoria do cliente ou está arquivado. `/api/admin/orquestrador/piloto` mostra `site_active` e consentimento, mas não a URL.
 - Não trocar o valor para `www.` às cegas: se (a) com `www.`, continua 2 e bloqueado. Primeiro ver as URLs dos dois cadastros no painel de sites.
+
+### 2026-11-23 · Retificação ORQUESTRADOR-2026-016 — site de teste liberado
+- A pedido do responsável, o site de teste passou a ser o domínio próprio dele (`www.` + domínio pessoal). Render, por merge: `PANDORA_ORCH_OPERATOR_ALLOWED_DOMAINS` e `PANDORA_ORCH_PILOT_DOMAIN` com esse host; `seonegocionomapa.com.br` saiu da lista de domínios do operador.
+- Deploy `dep-dc1rqr56e07s73e73npg` (commit `2c3e8cd`) **live** em 2026-11-23T04:15:27Z. Log 04:15:25Z: `admin_audit_rule: true`, `site_count: 2`, `consented_active_count: 1`, `unique_consented_site: true`, `operator_selected_count: 1`.
+- Também há dois cadastros desse host; o liberado é o que tem o host `www.` exato e não está revogado/arquivado. Primeiro site com o operador liberado.
+- Próximo passo (só o administrador, com MFA): autorizar as ferramentas gratuitas em `/admin/orquestrador/capacidades` e rodar cada motor uma vez. Nenhuma ferramenta autorizada nem executada até aqui.
