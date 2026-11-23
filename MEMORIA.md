@@ -470,3 +470,7 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - **Opções para decidir:** (a) avaliar o fragmento dentro do HTML real do tema (home ou página modelo do site, trocando o conteúdo principal) para medir rodapé e schema verdadeiros; (b) o executor (não o LLM) gerar JSON-LD `Person`/`WebPage` a partir de um arquivo de entidades confiável; (c) gate por dimensões de conteúdo, não pelo total do site.
 - **Limites:** sem credenciais WordPress na sessão; publicação não testada. Custo das sessões Claude limitado a US$ 1 cada pelo executor.
 - **Próxima ocorrência:** abrir `edicao-N-bruta.txt` antes de suspeitar do modelo; se a nota parar perto de 47 com `alertas` vazio, conferir as dimensões FOOTER/SCHEMA, não o texto.
+
+### 2026-11-23 · Retificação EDITORIAL-2026-001 — referência de concorrente no mesmo motor
+- `brasilgeo.ai/fundador/` (página completa, tema + JSON-LD em grafo) tira **76,8** no mesmo `PANDORA_GEO_SCORE` offline. Reforça que o corte de 95 do executor não é alcançável nem por página madura.
+- Aplicando os padrões dela (resposta direta sob H2-pergunta, fatos datados, identificadores com link, desambiguação, JSON-LD `ProfilePage`/`Person`/`FAQPage`), a página do fundador da GEO AI Citations foi de 47,3 para 54,0 só com o texto e para 71,0 com JSON-LD gerado fora do LLM (opção (b)). Restante: rodapé do tema e sameAs/CNPJ da empresa. Evidências em `pandora-corpo` `a242353`, `clientes/_proprios/geoaicitations.com/fundador-v2/`.
