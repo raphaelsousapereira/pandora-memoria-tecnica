@@ -489,3 +489,27 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   - A reprodução real dentro do iframe não foi testada, porque o teste aborta a rede de fora.
   - Páginas cuja CSP não permite `'self'` não recebem o bloco.
 - **Próxima ocorrência:** se o vídeo não tocar, abra o console e procure "Refused to frame" (CSP) ou o erro 153 do YouTube (referrer). Confira o cabeçalho com `curl -I` na página da ferramenta e veja se o caminho está no catálogo.
+
+## 2026-11-23 · VIDEO-2026-004 · roteiro em texto → MP4 com slides animados e voz pt-BR (PANDORA Apresenta)
+
+- **Projeto e componente:** PANDORA Cloud, pacote novo `pandora_apresenta/` (biblioteca, roteiro, cena, voz, motor e CLI). Branch `claude/aprenda-mais-videos-block-19ed0l`. Fuso: UTC.
+- **Pedido e aceite:** a partir de um texto, gerar um MP4 com áudio em português e slides em movimento. Os itens entram um por um, há ícones e capturas reais da ferramenta, e efeitos, estilos e design são escolhidos de uma biblioteca.
+- **Memória consultada:** `5af1474` (VIDEO-2026-001: separar argumentos de subprocesso, usar temporários privados e limitar duração e formatos; AJUDA-2026-001).
+- **Decisões e motivo:**
+  - Animação em HTML/CSS no Chromium, capturada quadro a quadro: `document.getAnimations()`, `pause()` e `currentTime = t`. Isso torna o resultado determinístico e permite qualquer efeito CSS. Os quadros vão em JPEG por pipe para o FFmpeg, sem arquivos intermediários.
+  - Voz Piper offline: Faber, Cadu, Jeff e Edresson, todas pt_BR no repositório `rhasspy/piper-voices` e conferidas com HTTP 200 em 2026-11-23. O motor nunca baixa a voz durante a geração; isso exige `voz baixar`.
+  - Transições com `xfade` e áudio com `acrossfade`. Cada fala ganha 0,6 s de silêncio antes (cobre a transição) e 0,9 s depois.
+- **Falhas encontradas e correções:**
+  - (1) O efeito de entrada sobrescrevia o `transform: translateX(-50%)` usado para centralizar a janela da captura. Correção: posição em px, sem transform.
+  - (2) O zoom de "foco-destaque" cortava destaques largos. Correção: limitar o zoom para o destaque caber na janela a partir do seu centro.
+  - (3) `@voz` dentro de um slide era ignorado sem aviso. Correção: chaves globais passam a valer em qualquer bloco.
+  - (4) O canal `stderr` do Popen ficava aberto (ResourceWarning). Correção: fechá-lo no `finally`.
+- **Achado fora do escopo (não corrigido):** em `/admin/schema` com viewport de 1440×900 no Chromium headless, o menu lateral fica no fluxo da página e o formulário vai para y≈3068. Isso se repete sem o bloco Aprenda mais e com a rede liberada, então é anterior a esta mudança. Falta confirmar num navegador real antes de tratar como defeito.
+- **Verificação:**
+  - `tests/test_apresenta.py`: 10 testes. Cobrem parser, recusa de opções fora da biblioteca, escape de HTML, todo layout × tema, cronograma, prévia PNG e MP4 real de 2 slides (H.264 1920×1080 + AAC, duração 4,4 s ±0,15 e quadros diferentes ao longo do tempo).
+  - Demonstração com voz Faber: 7 slides, 53,5 s, gerados em ~195 s (≈3,6× o tempo real).
+- **Limites:**
+  - Ainda não há tela no SaaS, nem fila ou limite de concorrência.
+  - Consumo de CPU e RAM no Render não foi medido.
+  - A qualidade da voz é sintética, e não houve avaliação com ouvintes.
+- **Próxima ocorrência:** se o vídeo sair sem movimento, gere uma `previa` em dois instantes e confira se `getAnimations()` retorna animações. Se a voz falhar, rode `python -m pandora_apresenta voz listar`. Se a transição falhar, confira se o nome existe no `xfade` do FFmpeg instalado.
