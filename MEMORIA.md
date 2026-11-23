@@ -513,3 +513,18 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   - Consumo de CPU e RAM no Render não foi medido.
   - A qualidade da voz é sintética, e não houve avaliação com ouvintes.
 - **Próxima ocorrência:** se o vídeo sair sem movimento, gere uma `previa` em dois instantes e confira se `getAnimations()` retorna animações. Se a voz falhar, rode `python -m pandora_apresenta voz listar`. Se a transição falhar, confira se o nome existe no `xfade` do FFmpeg instalado.
+
+### 2026-11-23 · Retificação VIDEO-2026-004 — layouts de desenho (codigo, diagrama, grafico)
+
+- **Mudança:** três layouts novos. `codigo` mostra o JSON-LD linha a linha com realce. `diagrama` traça linhas SVG com `stroke-dashoffset` do nó central aos satélites. `grafico` faz as barras crescerem com `scaleY`, e o número conta via `@property --n` (inteiro) com `counter()`.
+- **Falhas vistas na prévia e corrigidas:**
+  - O seletor `.diagrama svg` também posicionava os SVG dos ícones. Correção: `.diagrama>svg`.
+  - Os nós semitransparentes deixavam ver as linhas por baixo. Correção: fundo sólido com `color-mix`.
+  - O rótulo do gráfico encostava na marca. Correção: aumentar a margem inferior.
+  - Com `stroke-linecap:round`, uma linha ainda não traçada aparecia como um ponto. Correção: `opacity` animada junto com o traço.
+- **Verificação:**
+  - Mini aula "O que é schema?" com 7 slides e 51,6 s, gerada em ~171 s.
+  - Quadros conferidos no meio de cada animação.
+  - `tests/test_apresenta.py`: 13 testes aprovados.
+  - Os números do gráfico contam os itens dos exemplos da própria aula (3, 7 e 12), sem estatística externa.
+- **Commit:** `df725a8` em pandora-cloud.
