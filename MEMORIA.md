@@ -456,3 +456,9 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
   - No código antigo, 7 de 8 testes falham; no novo, a suíte do Orquestrador tem 203 aprovados.
 - **Limite:** não houve chamada real ao WPVibe, porque falta a conexão OAuth do SaaS e um site de homologação.
 - **Primeiro passo na ativação:** com a conexão OAuth do Studio Executiva, rodar `tools/list` e comparar os schemas de `rest_api` e `rest_api_write` com o fixture. Se divergirem, atualizar o fixture e o teste antes de ligar `PANDORA_ORCH_WEBSITE_DRAFT_ENABLED` ou `PANDORA_ORCH_WPVIBE_APPLY_ENABLED`.
+
+### 2026-11-23 · Retificação PAA-2026-001 — HTTP 200 com conteúdo montado por JavaScript
+
+No PANDORA Cloud, o inventário registrava HTTP 200 e o PAA mostrava zero páginas medidas. A memória consultada foi `862edbd45fd809569c24b711764e01d10b06348c`. O primeiro teste comparou o mesmo documento antes e depois do Chromium: três URLs públicas passaram de zero texto extraído para texto legível. O HTML de origem trazia um contêiner vazio e carregava o corpo via JavaScript.
+
+O [PR #296](https://github.com/raphaelsousapereira/pandora-cloud/pull/296) reaproveita o Chromium do Raio-X para contêineres de aplicativo sem texto ou perguntas suficientes. O PAA entrega ao navegador o documento já coletado, bloqueia novas navegações e valida domínio, robots.txt e orçamento para recursos. O HTML renderizado alimenta o extrator e a descoberta de links. A suíte PAA/Raio-X rodou 44 casos, com três pulados. Uma rodada local com marca sintética e concorrente real mediu três páginas e três perguntas em uma amostra limitada a cinco URLs. Houve aviso de conteúdo insuficiente em parte da amostra. A rodada usou o proxy de saída do ambiente. Ainda falta validar o fluxo autenticado publicado. Se houver regressão, reverter o PR. Para recorrências, comparar o corpo recebido e o DOM antes de alterar as regras de extração.
