@@ -486,3 +486,7 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - **Calibração:** página publicada medida no layout de `/sobre/` e `/servicos/` = 77,8; real = 78,8; fragmento = 54,3.
 - **Ainda não feito:** JSON-LD pelo executor (o `bleach` remove `<script>`), corte de 95 continua; com o layout real, uma página nova sem JSON-LD tirou 67,6.
 - **Próxima ocorrência:** se `layout.json` disser "Layout real indisponível", conferir se a API `/wp-json/wp/v2/pages` é pública e se o tema não reescreve o começo do conteúdo.
+
+### 2026-11-23 · EDITORIAL-2026-001 — página nova nasce órfã
+- `PANDORA_LINKS_SITE` em geoaicitations.com acusou `/fundador/` em `profundidade.fundas_ou_orfas` logo após a publicação: a missão cria a página, mas nenhuma página existente aponta para ela. Corrigido com links em `/sobre/` e `/autores/` e links de volta; LINKS 73,9 → 74,2. `PANDORA_SLUGS` não se aplica à página (mede maturidade do site).
+- Próxima ocorrência / evolução do executor: depois de publicar, rodar `PANDORA_LINKS_SITE` e propor links das páginas que já citam a entidade. Evidência: `pandora-corpo` `clientes/_proprios/geoaicitations.com/fundador-v2/links-antes.json` e `links-depois.json`.
