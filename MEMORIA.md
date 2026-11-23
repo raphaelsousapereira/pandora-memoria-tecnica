@@ -528,3 +528,29 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   - `tests/test_apresenta.py`: 13 testes aprovados.
   - Os números do gráfico contam os itens dos exemplos da própria aula (3, 7 e 12), sem estatística externa.
 - **Commit:** `df725a8` em pandora-cloud.
+
+## 2026-11-23 · PROSPECCAO-2026-001 · empresas sem site via Google Maps (Serper) com confirmação na busca
+
+- **Projeto e componente:** PANDORA Cloud, `pandora_cloud/prospeccao.py` e `prospeccao_routes.py` (`/admin/sem-site`). Branch `claude/aprenda-mais-videos-block-19ed0l`, commit `748c87d`. Fuso: UTC.
+- **Pedido e aceite:** buscar no Google automaticamente e identificar empresas sem site.
+- **Memória consultada:** `fcb20a2`. Não há caso específico. Reaproveitado o `serp_collector.py` (Discovery): `_post`, `_site` e a política de custo `PANDORA_ALLOW_PAID_APIS`.
+- **Evidência inicial (Serper real, 2026-11-23):**
+  - Places "dentista em Campinas": 0 de 10 sem `website`.
+  - Places "borracharia em Campinas": 9 de 10 sem site.
+  - O campo de site some quando a empresa não tem. O Places devolve 10 itens por página, com `cid`, telefone, `rating` e `ratingCount`.
+- **Armadilhas:**
+  - (1) A ausência de site no Maps não prova falta de site. Por isso há a busca "nome + cidade".
+  - (2) Portais genéricos como `borrachariacampinas.com.br` aparecem na busca e não podem contar como site da empresa. Correção: o domínio precisa conter um termo distintivo do nome, sem nicho, cidade e palavras genéricas.
+  - (3) O campo de site do Maps muitas vezes é Instagram ou WhatsApp. Esses casos são classificados como "só rede social".
+  - (4) Com os limites atuais (3 páginas, 5 bairros, 30 confirmações), o teto real é 48 buscas. A trava de 50 fica só como guarda.
+- **Verificação:**
+  - Rodada real: 1 página e 3 confirmações, 4 buscas, 10 empresas. Resultado: 3 sem site confirmado, 6 não confirmadas e 1 com site; nenhum portal genérico aceito.
+  - `tests/test_prospeccao.py`: 10 testes com Google falso.
+  - `tests/browser_sem_site.py`: desktop e celular.
+  - Testes de plano, menu e workspace aprovados depois de incluir `sem-site` em `plans.ADMIN_ONLY`.
+- **Limites:**
+  - Não testa domínios por palpite (risco de domínio estacionado).
+  - Só a primeira página orgânica entra na confirmação.
+  - Uma rodada por vez, numa thread; um reinício marca a rodada como interrompida após 20 min.
+  - Não há disparo de contato, por causa da LGPD.
+- **Próxima ocorrência:** se aparecer muito "site fora do Maps" falso, veja `dominios_vistos` na rodada e acrescente o domínio a `DIRETORIOS`. Se tudo vier "sem site no Maps", confira se `confirmar` não ficou em 0.
