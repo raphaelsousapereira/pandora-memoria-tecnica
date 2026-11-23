@@ -474,3 +474,8 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 ### 2026-11-23 · Retificação EDITORIAL-2026-001 — referência de concorrente no mesmo motor
 - `brasilgeo.ai/fundador/` (página completa, tema + JSON-LD em grafo) tira **76,8** no mesmo `PANDORA_GEO_SCORE` offline. Reforça que o corte de 95 do executor não é alcançável nem por página madura.
 - Aplicando os padrões dela (resposta direta sob H2-pergunta, fatos datados, identificadores com link, desambiguação, JSON-LD `ProfilePage`/`Person`/`FAQPage`), a página do fundador da GEO AI Citations foi de 47,3 para 54,0 só com o texto e para 71,0 com JSON-LD gerado fora do LLM (opção (b)). Restante: rodapé do tema e sameAs/CNPJ da empresa. Evidências em `pandora-corpo` `a242353`, `clientes/_proprios/geoaicitations.com/fundador-v2/`.
+
+### 2026-11-23 · Fechamento EDITORIAL-2026-001 — /fundador/ publicada
+- Publicada por pedido explícito do dono em https://geoaicitations.com/fundador/ (WP ID 791), pelo WPVibe `rest_api_write` (não pelo executor, que não alcança 95). GEO na página real: **78,8** (offline v2+JSON-LD dava 71,6; o rodapé real do tema somou NAP e E-E-A-T).
+- Armadilhas do tema Page Builder Framework: imprime `entry-title` como 2º H1 se a página não tiver `wpbf_options=["remove-title"]`; o Yoast não usa o resumo como meta description, é preciso gravar `_yoast_wpseo_metadesc` (e `_yoast_wpseo_title` se o título + sufixo passar de 65), com `--force` no WP-CLI do WPVibe.
+- Evidência: `pandora-corpo` `clientes/_proprios/geoaicitations.com/fundador-v2/geo-publicada.json` e `publicada-2026-11-23.html`.
