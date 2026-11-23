@@ -456,3 +456,14 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
   - No código antigo, 7 de 8 testes falham; no novo, a suíte do Orquestrador tem 203 aprovados.
 - **Limite:** não houve chamada real ao WPVibe, porque falta a conexão OAuth do SaaS e um site de homologação.
 - **Primeiro passo na ativação:** com a conexão OAuth do Studio Executiva, rodar `tools/list` e comparar os schemas de `rest_api` e `rest_api_write` com o fixture. Se divergirem, atualizar o fixture e o teste antes de ligar `PANDORA_ORCH_WEBSITE_DRAFT_ENABLED` ou `PANDORA_ORCH_WPVIBE_APPLY_ENABLED`.
+
+## 2026-11-23 · CONTEUDO-2026-001 · Auditoria de site hospedeiro (reviewscentral.net) bloqueia API e sitemap a curl
+
+- **Projeto/ambiente:** artigo para GEO AI CITATIONS (geoaicitations.com), coleta pública em 2026-11-23, fuso America/Sao_Paulo.
+- **Pedido/aceite:** pesquisar reviewscentral.net/sobre-nos e apontar falhas, em formato de artigo. Entregue como HTML no padrão `.nnm-pc` das páginas do site; rascunho no WordPress só com confirmação.
+- **Memória consultada:** main `862edbd`; nenhum caso anterior sobre hospedeiro. ORQUESTRADOR-2026-015 aplicável: escrita no WordPress via `rest_api_write`, nunca `rest_api`.
+- **Sintoma de coleta:** `curl` em `/sitemap_index.xml` recebe página de desafio "One moment, please..."; `/wp-json/wp/v2/posts` e `/users` recebem 403 da Cloudflare, enquanto `/wp-json/wp/v2/pages` e `/categories` respondem 200.
+- **Contorno que funcionou:** Chromium do Playwright com espera de 7 s lê o sitemap (com `lastmod`) e os posts; datas dos posts vêm de `article:published_time`/`modified_time`. `dig` não existe no contêiner: usar DoH (`dns.google/resolve`, `cloudflare-dns.com/dns-query`). RDAP .net em `rdap.verisign.com/net/v1/domain/…`; .com.br em `rdap.registro.br`.
+- **Sinais com maior poder de distinção:** post datado antes do registro do domínio (RDAP), dezenas de `lastmod` no mesmo minuto, páginas de confiança criadas após o conteúdo comercial (API de páginas), `sameAs` do autor apontando para host técnico (Cloudways), domínio sem MX, assimetria de links/palavras/FAQ por marca, NS Cloudflare compartilhado entre sites linkados (sugere conta comum, não prova).
+- **Limites:** nada prova pagamento; páginas mudam; geoaicitations.com não tem posts, só páginas — o artigo segue o formato das páginas (bloco `wp:html`).
+- **Próxima ocorrência:** começar por RDAP + `/wp-json/wp/v2/pages?_fields=id,date,modified,slug,author` + sitemap via Playwright; só então ler textos.
