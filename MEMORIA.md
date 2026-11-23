@@ -554,3 +554,12 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   - Uma rodada por vez, numa thread; um reinício marca a rodada como interrompida após 20 min.
   - Não há disparo de contato, por causa da LGPD.
 - **Próxima ocorrência:** se aparecer muito "site fora do Maps" falso, veja `dominios_vistos` na rodada e acrescente o domínio a `DIRETORIOS`. Se tudo vier "sem site no Maps", confira se `confirmar` não ficou em 0.
+
+### 2026-11-23 · Retificação PROSPECCAO-2026-001 — PDF e pesquisa da empresa com IA
+
+- **Mudança:**
+  - PDF pelo `pdf_marca.Report` (ReportLab).
+  - Links por empresa para ChatGPT (`?temporary-chat=true&q=`), Claude (`/new?q=`) e Perplexity, o mesmo padrão de `concorrentes_meus.js`.
+  - "Copiar pergunta" para usar no Claude Code. A pergunta tem menos de 1.800 caracteres, só dados públicos da empresa, e pede para não pesquisar pessoas físicas.
+- **Armadilha:** `Report.section()` deixa o título com `keepWithNext`, e uma tabela que não cabe no restante da página vai inteira para a próxima, deixando uma página quase vazia. Correção: `Spacer(1, 2)` entre o título e a tabela. Na rodada real, o PDF passou de 4 para 3 páginas.
+- **Verificação:** `test_prospeccao` (11) e `browser_sem_site.py` aprovados. PDF da rodada real conferido em PNG. Commit `eb83ed3`.
