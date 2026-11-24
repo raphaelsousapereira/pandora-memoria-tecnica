@@ -466,3 +466,115 @@ O [PR #296](https://github.com/raphaelsousapereira/pandora-cloud/pull/296) reapr
 ### 2026-11-23 · Retificação PAA-2026-001 — correção publicada no Render
 
 Com autorização de publicação, o PR #296 foi integrado à main em `7143849391657e7b6a592e152a1aafcdfad6db1b`. A memória consultada foi `061ebf96a955a36fb81e1db8d8424fd17fbc4711`. O GitHub Actions não iniciou a avaliação por limite de orçamento. A publicação usou a verificação local anterior, incluindo regressões do assistente e avaliação por família, e a comparação dos quatro arquivos do PR com o merge. O deploy automático [dep-dc25bjl9el5s73bf61gg](https://dashboard.render.com/web/srv-dbmj0q6417fc73eobvtg/deploys/dep-dc25bjl9el5s73bf61gg) ficou live às 12h05, horário de Brasília. O domínio publicado respondeu HTTP 200 em /health e HTTP 401 em /api/admin/paa sem sessão. A primeira consulta aos logs após a ativação retornou zero erros de aplicação. O navegador abriu a tela de login, então uma nova rodada autenticada em produção segue pendente.
+
+## 2026-11-23 · AJUDA-2026-001 · vídeos de ensino nas ferramentas bloqueados pela CSP
+
+- **Projeto, componente e revisão:** PANDORA Cloud, ajuda das ferramentas (`pandora_cloud/aprenda.py`, `static/aprenda-mais.js`/`.css`, middleware `SecurityHeaders` em `portal.py`). Base `7143849`, branch `claude/aprenda-mais-videos-block-19ed0l`. Fuso: UTC.
+- **Pedido e aceite:** bloco "Aprenda mais" dentro das ferramentas com vídeos de ensino hospedados no YouTube como não listados. A capa deve mostrar a imagem do vídeo, e não apenas um botão.
+- **Memória consultada:** `912c1a6`. Não havia caso sobre vídeo incorporado. VIDEO-2026-001 se aplica parcialmente: manter JS/CSS fora do HTML por causa da CSP.
+- **Sintoma e causa:** `brand.csp()` começa com `default-src 'none'` e não tem `frame-src`/`media-src`, então qualquer iframe do YouTube é bloqueado. O portal também envia `Referrer-Policy: no-referrer`, e o player do YouTube recusa tocar sem a origem. Por fim, a ajuda existente (`tool_help.py`) só aceitava a ferramenta `schema`.
+- **Armadilha evitada:** várias rotas acrescentam `; frame-src 'self'` à CSP. Se `csp()` passasse a declarar um `frame-src` próprio, o navegador usaria só a primeira diretiva e as prévias em iframe dessas rotas quebrariam. Por isso a liberação **funde** origens na diretiva existente (ou herda de `default-src`), e só nas páginas com vídeo cadastrado.
+- **Correção:**
+  - O catálogo `help_content/aprenda.pt-BR.json` mapeia o caminho da página para os IDs do YouTube.
+  - O middleware injeta o script e soma `https://www.youtube-nocookie.com` (frame-src) e `https://i.ytimg.com` (img-src) apenas nesses caminhos.
+  - O player é criado só depois do clique, com `referrerpolicy="strict-origin-when-cross-origin"`.
+  - A miniatura carrega sem `loading=lazy`, porque o bloco fica abaixo da dobra e saía vazio. Uma imagem com `naturalWidth <= 120` (o marcador cinza que o YouTube devolve para ID inexistente) é removida.
+  - Um catálogo inválido é ignorado e registrado no log, sem derrubar a ferramenta.
+- **Verificação:**
+  - `tests/test_aprenda.py`: 9 testes cobrindo validação, fusão da CSP e página com e sem vídeo.
+  - `tests/browser_aprenda.py`: desktop e celular, sem rede. Confere a miniatura servida localmente, que nada do player é baixado antes do clique, o iframe e o referrer, a ausência de violação de CSP e que o bloco recolhido é lembrado.
+  - Captura manual com `i.ytimg.com` real mostrou a miniatura nas duas larguras.
+- **Limites:**
+  - Nenhum vídeo real foi cadastrado, e o catálogo publicado está vazio, porque os IDs dependem do operador.
+  - A reprodução real dentro do iframe não foi testada, porque o teste aborta a rede de fora.
+  - Páginas cuja CSP não permite `'self'` não recebem o bloco.
+- **Próxima ocorrência:** se o vídeo não tocar, abra o console e procure "Refused to frame" (CSP) ou o erro 153 do YouTube (referrer). Confira o cabeçalho com `curl -I` na página da ferramenta e veja se o caminho está no catálogo.
+
+## 2026-11-23 · VIDEO-2026-004 · roteiro em texto → MP4 com slides animados e voz pt-BR (PANDORA Apresenta)
+
+- **Projeto e componente:** PANDORA Cloud, pacote novo `pandora_apresenta/` (biblioteca, roteiro, cena, voz, motor e CLI). Branch `claude/aprenda-mais-videos-block-19ed0l`. Fuso: UTC.
+- **Pedido e aceite:** a partir de um texto, gerar um MP4 com áudio em português e slides em movimento. Os itens entram um por um, há ícones e capturas reais da ferramenta, e efeitos, estilos e design são escolhidos de uma biblioteca.
+- **Memória consultada:** `5af1474` (VIDEO-2026-001: separar argumentos de subprocesso, usar temporários privados e limitar duração e formatos; AJUDA-2026-001).
+- **Decisões e motivo:**
+  - Animação em HTML/CSS no Chromium, capturada quadro a quadro: `document.getAnimations()`, `pause()` e `currentTime = t`. Isso torna o resultado determinístico e permite qualquer efeito CSS. Os quadros vão em JPEG por pipe para o FFmpeg, sem arquivos intermediários.
+  - Voz Piper offline: Faber, Cadu, Jeff e Edresson, todas pt_BR no repositório `rhasspy/piper-voices` e conferidas com HTTP 200 em 2026-11-23. O motor nunca baixa a voz durante a geração; isso exige `voz baixar`.
+  - Transições com `xfade` e áudio com `acrossfade`. Cada fala ganha 0,6 s de silêncio antes (cobre a transição) e 0,9 s depois.
+- **Falhas encontradas e correções:**
+  - (1) O efeito de entrada sobrescrevia o `transform: translateX(-50%)` usado para centralizar a janela da captura. Correção: posição em px, sem transform.
+  - (2) O zoom de "foco-destaque" cortava destaques largos. Correção: limitar o zoom para o destaque caber na janela a partir do seu centro.
+  - (3) `@voz` dentro de um slide era ignorado sem aviso. Correção: chaves globais passam a valer em qualquer bloco.
+  - (4) O canal `stderr` do Popen ficava aberto (ResourceWarning). Correção: fechá-lo no `finally`.
+- **Achado fora do escopo (não corrigido):** em `/admin/schema` com viewport de 1440×900 no Chromium headless, o menu lateral fica no fluxo da página e o formulário vai para y≈3068. Isso se repete sem o bloco Aprenda mais e com a rede liberada, então é anterior a esta mudança. Falta confirmar num navegador real antes de tratar como defeito.
+- **Verificação:**
+  - `tests/test_apresenta.py`: 10 testes. Cobrem parser, recusa de opções fora da biblioteca, escape de HTML, todo layout × tema, cronograma, prévia PNG e MP4 real de 2 slides (H.264 1920×1080 + AAC, duração 4,4 s ±0,15 e quadros diferentes ao longo do tempo).
+  - Demonstração com voz Faber: 7 slides, 53,5 s, gerados em ~195 s (≈3,6× o tempo real).
+- **Limites:**
+  - Ainda não há tela no SaaS, nem fila ou limite de concorrência.
+  - Consumo de CPU e RAM no Render não foi medido.
+  - A qualidade da voz é sintética, e não houve avaliação com ouvintes.
+- **Próxima ocorrência:** se o vídeo sair sem movimento, gere uma `previa` em dois instantes e confira se `getAnimations()` retorna animações. Se a voz falhar, rode `python -m pandora_apresenta voz listar`. Se a transição falhar, confira se o nome existe no `xfade` do FFmpeg instalado.
+
+### 2026-11-23 · Retificação VIDEO-2026-004 — layouts de desenho (codigo, diagrama, grafico)
+
+- **Mudança:** três layouts novos. `codigo` mostra o JSON-LD linha a linha com realce. `diagrama` traça linhas SVG com `stroke-dashoffset` do nó central aos satélites. `grafico` faz as barras crescerem com `scaleY`, e o número conta via `@property --n` (inteiro) com `counter()`.
+- **Falhas vistas na prévia e corrigidas:**
+  - O seletor `.diagrama svg` também posicionava os SVG dos ícones. Correção: `.diagrama>svg`.
+  - Os nós semitransparentes deixavam ver as linhas por baixo. Correção: fundo sólido com `color-mix`.
+  - O rótulo do gráfico encostava na marca. Correção: aumentar a margem inferior.
+  - Com `stroke-linecap:round`, uma linha ainda não traçada aparecia como um ponto. Correção: `opacity` animada junto com o traço.
+- **Verificação:**
+  - Mini aula "O que é schema?" com 7 slides e 51,6 s, gerada em ~171 s.
+  - Quadros conferidos no meio de cada animação.
+  - `tests/test_apresenta.py`: 13 testes aprovados.
+  - Os números do gráfico contam os itens dos exemplos da própria aula (3, 7 e 12), sem estatística externa.
+- **Commit:** `df725a8` em pandora-cloud.
+
+## 2026-11-23 · PROSPECCAO-2026-001 · empresas sem site via Google Maps (Serper) com confirmação na busca
+
+- **Projeto e componente:** PANDORA Cloud, `pandora_cloud/prospeccao.py` e `prospeccao_routes.py` (`/admin/sem-site`). Branch `claude/aprenda-mais-videos-block-19ed0l`, commit `748c87d`. Fuso: UTC.
+- **Pedido e aceite:** buscar no Google automaticamente e identificar empresas sem site.
+- **Memória consultada:** `fcb20a2`. Não há caso específico. Reaproveitado o `serp_collector.py` (Discovery): `_post`, `_site` e a política de custo `PANDORA_ALLOW_PAID_APIS`.
+- **Evidência inicial (Serper real, 2026-11-23):**
+  - Places "dentista em Campinas": 0 de 10 sem `website`.
+  - Places "borracharia em Campinas": 9 de 10 sem site.
+  - O campo de site some quando a empresa não tem. O Places devolve 10 itens por página, com `cid`, telefone, `rating` e `ratingCount`.
+- **Armadilhas:**
+  - (1) A ausência de site no Maps não prova falta de site. Por isso há a busca "nome + cidade".
+  - (2) Portais genéricos como `borrachariacampinas.com.br` aparecem na busca e não podem contar como site da empresa. Correção: o domínio precisa conter um termo distintivo do nome, sem nicho, cidade e palavras genéricas.
+  - (3) O campo de site do Maps muitas vezes é Instagram ou WhatsApp. Esses casos são classificados como "só rede social".
+  - (4) Com os limites atuais (3 páginas, 5 bairros, 30 confirmações), o teto real é 48 buscas. A trava de 50 fica só como guarda.
+- **Verificação:**
+  - Rodada real: 1 página e 3 confirmações, 4 buscas, 10 empresas. Resultado: 3 sem site confirmado, 6 não confirmadas e 1 com site; nenhum portal genérico aceito.
+  - `tests/test_prospeccao.py`: 10 testes com Google falso.
+  - `tests/browser_sem_site.py`: desktop e celular.
+  - Testes de plano, menu e workspace aprovados depois de incluir `sem-site` em `plans.ADMIN_ONLY`.
+- **Limites:**
+  - Não testa domínios por palpite (risco de domínio estacionado).
+  - Só a primeira página orgânica entra na confirmação.
+  - Uma rodada por vez, numa thread; um reinício marca a rodada como interrompida após 20 min.
+  - Não há disparo de contato, por causa da LGPD.
+- **Próxima ocorrência:** se aparecer muito "site fora do Maps" falso, veja `dominios_vistos` na rodada e acrescente o domínio a `DIRETORIOS`. Se tudo vier "sem site no Maps", confira se `confirmar` não ficou em 0.
+
+### 2026-11-23 · Retificação PROSPECCAO-2026-001 — PDF e pesquisa da empresa com IA
+
+- **Mudança:**
+  - PDF pelo `pdf_marca.Report` (ReportLab).
+  - Links por empresa para ChatGPT (`?temporary-chat=true&q=`), Claude (`/new?q=`) e Perplexity, o mesmo padrão de `concorrentes_meus.js`.
+  - "Copiar pergunta" para usar no Claude Code. A pergunta tem menos de 1.800 caracteres, só dados públicos da empresa, e pede para não pesquisar pessoas físicas.
+- **Armadilha:** `Report.section()` deixa o título com `keepWithNext`, e uma tabela que não cabe no restante da página vai inteira para a próxima, deixando uma página quase vazia. Correção: `Spacer(1, 2)` entre o título e a tabela. Na rodada real, o PDF passou de 4 para 3 páginas.
+- **Verificação:** `test_prospeccao` (11) e `browser_sem_site.py` aprovados. PDF da rodada real conferido em PNG. Commit `eb83ed3`.
+
+## 2026-11-24 · UI-2026-001 · faixa "Modo administrador" virou selo com coroa no cabeçalho
+
+- **Projeto e componente:** PANDORA Cloud. `workspace_ui.ADMIN_BANNER` é usado nas telas `active='admin'` renderizadas pelo servidor; nas demais telas `/admin/*` e nas ferramentas da lista `TOOLS`, o selo é inserido por `static/workspace-nav.js`. O estilo fica em `navegacao-cloud.css`. Commit `9bf0f9a`.
+- **Pedido:** a faixa ocupava uma linha inteira; o usuário pediu um ícone de coroa com texto curto.
+- **Correção:**
+  - Selo `<a class="pc-admin-banner" data-pc-admin-banner href="/admin">` inserido antes de `.pc-person-link`. Sem cabeçalho, ele vai para o topo do `<main>`.
+  - Mostra "ADMIN" no computador e só a coroa (36×36) abaixo de 760 px.
+  - Texto `.pc-sr` "Modo administrador: abrir o painel do administrador" para leitor de tela e testes.
+  - A classe e o atributo foram mantidos, então `test_pagina_comum` e `browser_admin_modo` continuam encontrando o selo.
+- **Achado:**
+  - `tests/browser_admin_modo.py` já falhava antes da mudança (strict mode). O seletor `#pc-navigation a[data-pc-admin]` encontra dois links "Administração". Correção: seletor com `[href="/admin"]`.
+  - Depois disso, o teste chega até o selo no celular e para mais adiante em `.score-label` "GEO" na tabela de notas do celular, sem relação com o selo. Ficou para investigar.
+  - O teste não está em nenhum workflow e usa `chromium.launch()` sem `executablePath`. Para rodar localmente, use o `sitecustomize` do `tools/ci_local.py` com `PANDORA_CHROMIUM`.
+- **Verificação:** capturas em 1280 e 390 px de `/admin/sem-site`; selo com 88×32 e 36×36. `test_pagina_comum` e `test_admin_cta_layout` aprovados.
