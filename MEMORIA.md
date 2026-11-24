@@ -578,3 +578,19 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   - Depois disso, o teste chega até o selo no celular e para mais adiante em `.score-label` "GEO" na tabela de notas do celular, sem relação com o selo. Ficou para investigar.
   - O teste não está em nenhum workflow e usa `chromium.launch()` sem `executablePath`. Para rodar localmente, use o `sitecustomize` do `tools/ci_local.py` com `PANDORA_CHROMIUM`.
 - **Verificação:** capturas em 1280 e 390 px de `/admin/sem-site`; selo com 88×32 e 36×36. `test_pagina_comum` e `test_admin_cta_layout` aprovados.
+
+## 2026-11-24 · UI-2026-002 · PANDORA BLOG pedia digitar o site e abas/botões fora do padrão iOS
+
+- Projeto, componente, ambiente, revisão e fuso horário: pandora-cloud, `pandora_cloud/blog_ui.py` (/admin/blog), sessão cloud, commit 82dff2a na branch `claude/site-preselection-apple-ux-ei3s4h`, America/Sao_Paulo.
+- Pedido e critério observável de aceite: sites cadastrados já selecionáveis em vez de só digitar; botões com UX padrão Apple (captura de iPhone, tema escuro).
+- Memória consultada antes da mudança (commit e IDs): 516ef90; busca por blog/seletor/botões sem caso equivalente (UI-2026-001 é o selo do cabeçalho).
+- Sintoma, ponto de reprodução, comportamento esperado e observado: 390 px escuro, abas como cinco botões contornados em três linhas e campo de URL vazio sem lista de sites.
+- Hipóteses em ordem e teste que diferencia cada uma: (1) tema escuro com CSS próprio do Blog; (2) filtro global. Regras casadas no Playwright: `html` tem `filter: invert(.9) hue-rotate(180deg)` de `static/theme.css` (data-pn-auto-dark); o Blog só tem CSS claro.
+- Tentativas em ordem, comando ou ação, resultado e motivo para mudar de caminho: reaproveitada a lista de `/api/assistente/contexto` (mesma do seletor do Assistente, escopo `workspace.scope`, até 100 sites) em vez de criar rota nova.
+- Causa demonstrada, evidência e causas ainda incertas: tela foi escrita só com campos `type=url` e botões contornados de 9 px; sem seletor.
+- Correção exata, arquivos, configurações e condições de aplicação: seletor `#blog-site` preenche `post-url`, `c-url`, `c-site`, `blog-url`, `sinais-url`, `w-site`; "Outro endereço" limpa e foca; escolha em localStorage `pc-blog-site` e `?site=`. Abas viram controle segmentado (rótulos curtos abaixo de 640 px), botões sem contorno com 44 px, secundário tingido; primários com `data-keep-colors` para manter azul/branco sob o filtro escuro.
+- Verificação de implementação, build, runtime e jornada do usuário: `tests/browser_blog.py` (claro/escuro 390 px, 1280 px, persistência ao recarregar, sem rolagem horizontal, sem erro JS) passou; `tests/test_blog_tool.py` passou.
+- Cobertura real, simulações, falhas de ambiente e limites da conclusão: Chromium headless, não Safari real. `test_assistant_blog_sinais.py::test_copias_conferem_com_o_manifesto` (motor PANDORA_BLOG) já falhava sem a mudança. Em 1280 px o menu lateral aparece empilhado acima do conteúdo também antes da mudança — não investigado.
+- Recuperação, efeitos colaterais e como reconhecer regressão: se a lista não carregar, a nota diz "Lista de sites indisponível: digite o endereço" e os campos seguem livres.
+- Próxima ocorrência: em tela escura com cor estranha, conferir primeiro o filtro de `theme.css` antes de escrever CSS escuro; para botão que deve manter a cor, `data-keep-colors`.
+- Links de evidência revisados, PR, deploy, data e responsável pela confirmação: commit raphaelsousapereira/pandora-cloud@82dff2a; sem PR e sem deploy nesta sessão; confirmação visual no iPhone pendente com o operador.
