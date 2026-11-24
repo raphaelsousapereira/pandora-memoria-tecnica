@@ -563,3 +563,18 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   - "Copiar pergunta" para usar no Claude Code. A pergunta tem menos de 1.800 caracteres, só dados públicos da empresa, e pede para não pesquisar pessoas físicas.
 - **Armadilha:** `Report.section()` deixa o título com `keepWithNext`, e uma tabela que não cabe no restante da página vai inteira para a próxima, deixando uma página quase vazia. Correção: `Spacer(1, 2)` entre o título e a tabela. Na rodada real, o PDF passou de 4 para 3 páginas.
 - **Verificação:** `test_prospeccao` (11) e `browser_sem_site.py` aprovados. PDF da rodada real conferido em PNG. Commit `eb83ed3`.
+
+## 2026-11-24 · UI-2026-001 · faixa "Modo administrador" virou selo com coroa no cabeçalho
+
+- **Projeto e componente:** PANDORA Cloud. `workspace_ui.ADMIN_BANNER` é usado nas telas `active='admin'` renderizadas pelo servidor; nas demais telas `/admin/*` e nas ferramentas da lista `TOOLS`, o selo é inserido por `static/workspace-nav.js`. O estilo fica em `navegacao-cloud.css`. Commit `9bf0f9a`.
+- **Pedido:** a faixa ocupava uma linha inteira; o usuário pediu um ícone de coroa com texto curto.
+- **Correção:**
+  - Selo `<a class="pc-admin-banner" data-pc-admin-banner href="/admin">` inserido antes de `.pc-person-link`. Sem cabeçalho, ele vai para o topo do `<main>`.
+  - Mostra "ADMIN" no computador e só a coroa (36×36) abaixo de 760 px.
+  - Texto `.pc-sr` "Modo administrador: abrir o painel do administrador" para leitor de tela e testes.
+  - A classe e o atributo foram mantidos, então `test_pagina_comum` e `browser_admin_modo` continuam encontrando o selo.
+- **Achado:**
+  - `tests/browser_admin_modo.py` já falhava antes da mudança (strict mode). O seletor `#pc-navigation a[data-pc-admin]` encontra dois links "Administração". Correção: seletor com `[href="/admin"]`.
+  - Depois disso, o teste chega até o selo no celular e para mais adiante em `.score-label` "GEO" na tabela de notas do celular, sem relação com o selo. Ficou para investigar.
+  - O teste não está em nenhum workflow e usa `chromium.launch()` sem `executablePath`. Para rodar localmente, use o `sitecustomize` do `tools/ci_local.py` com `PANDORA_CHROMIUM`.
+- **Verificação:** capturas em 1280 e 390 px de `/admin/sem-site`; selo com 88×32 e 36×36. `test_pagina_comum` e `test_admin_cta_layout` aprovados.
