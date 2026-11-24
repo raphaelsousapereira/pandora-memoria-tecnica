@@ -457,6 +457,13 @@ O contador do PAA publicava só domínio e total. O PR [#279](https://github.com
 - **Limite:** não houve chamada real ao WPVibe, porque falta a conexão OAuth do SaaS e um site de homologação.
 - **Primeiro passo na ativação:** com a conexão OAuth do Studio Executiva, rodar `tools/list` e comparar os schemas de `rest_api` e `rest_api_write` com o fixture. Se divergirem, atualizar o fixture e o teste antes de ligar `PANDORA_ORCH_WEBSITE_DRAFT_ENABLED` ou `PANDORA_ORCH_WPVIBE_APPLY_ENABLED`.
 
+### 2026-11-24 · Retificação ORQUESTRADOR-2026-015 — schema ao vivo confere com o fixture
+
+- **Memória consultada:** `72c4469`. A auditoria de 22/11 foi citada de novo como bloqueio aberto, mas a correção já estava na main do `pandora-cloud` (squash `0fee67b`, PR #284). Ler a seção de correção antes de repetir o diagnóstico.
+- **Conferência:** `tools/list` do WPVibe lido em 2026-11-24 pelo conector WPVibe de uma sessão Claude Code (não pela conexão OAuth do SaaS). `rest_api` e `rest_api_write` têm as mesmas propriedades, tipos, `enum` de `method` (POST, PUT, DELETE) e `required` de `tests/fixtures/wpvibe_rest_tools.json`. Só as descrições mudaram, e o fixture não as compara.
+- **Teste:** `pytest -q tests/test_orchestrator_wpvibe_contract.py tests/test_orchestrator_operator_wpvibe.py` na main `06febf1` → 12 passed.
+- **Ainda falta para operar:** conexão OAuth do SaaS ao WPVibe, um site de homologação com consentimento, par ou domínio na allowlist e as flags `PANDORA_ORCH_WEBSITE_DRAFT_ENABLED`/`PANDORA_ORCH_WPVIBE_APPLY_ENABLED`. Repetir a comparação do schema pela conexão do SaaS antes de ligar as flags.
+
 ### 2026-11-23 · Retificação PAA-2026-001 — HTTP 200 com conteúdo montado por JavaScript
 
 No PANDORA Cloud, o inventário registrava HTTP 200 e o PAA mostrava zero páginas medidas. A memória consultada foi `862edbd45fd809569c24b711764e01d10b06348c`. O primeiro teste comparou o mesmo documento antes e depois do Chromium: três URLs públicas passaram de zero texto extraído para texto legível. O HTML de origem trazia um contêiner vazio e carregava o corpo via JavaScript.
