@@ -4,7 +4,7 @@
 
 Índice pesquisável: AUDIO-2026-001 · Dora · microfone oculto · Render live · Whisper · feature flag · Chromium · transcrição em português. Acrescente os próximos projetos ao índice e ao final do arquivo.
 
-Índice Porto Alegre em Dados: PORTOALEGRE-2026-001 · WPVibe 526 · SSL de site novo · PORTOALEGRE-2026-002 · ITBI · m² por bairro · efeito de composição · prédios novos · PORTOALEGRE-2026-003 · Wikimedia Commons 429 · Banco de Imagens da Prefeitura · PORTOALEGRE-2026-004 · tempo de leitura inflado · gerador não determinístico · CSV CRLF · GEO-2026-001 · GEO Score editorial · falsos negativos do medidor.
+Índice Porto Alegre em Dados: PORTOALEGRE-2026-001 · WPVibe 526 · SSL de site novo · PORTOALEGRE-2026-002 · ITBI · m² por bairro · efeito de composição · prédios novos · PORTOALEGRE-2026-003 · Wikimedia Commons 429 · Banco de Imagens da Prefeitura · PORTOALEGRE-2026-004 · tempo de leitura inflado · gerador não determinístico · CSV CRLF · GEO-2026-001 · GEO Score editorial · falsos negativos do medidor · PORTOALEGRE-2026-005 · LicitaCon DMAE 54907 · contrato não localizado · valor de comunicado divergente.
 
 ## 2026-11-20 · AUDIO-2026-001 · O portal estava online e o microfone continuava oculto
 
@@ -649,4 +649,15 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - **Falsos negativos encontrados ao conferir verificação por verificação:** (1) assinatura e data do concorrente ficam fora de `<article>`: ler a região do H1 em diante; (2) data sem ano ("06 de Novembro") e mês com maiúscula; (3) link de WhatsApp de contato com corretor (`phone=`) contado como compartilhamento: exigir `send?text=`; (4) organização dentro de `publisher` não era lida: percorrer objetos JSON-LD aninhados; (5) assinatura sem "Por": aceitar `rel="author"`.
 - **Resultado com o método corrigido:** Urban 51,0 (pesos iguais 47,5); nossa matéria com dados do ITBI 96,7; média de 11 matérias 94,4. A nota mede prontidão, não citações reais; nossas páginas ainda não estavam no ar.
 - **Próxima ocorrência:** nunca relatar nota de GEO sem antes abrir o detalhe das verificações que zeraram nos dois lados; publicar também a nota com pesos iguais; registrar limites (não mede citações, rubrica autoral).
+
+## 2026-11-24 · PORTOALEGRE-2026-005 · Obra dos pôlderes 7 e 8: comunicado com valor divergente e contrato das obras civis fora do LicitaCon
+
+- **Projeto, componente:** porto-alegre-em-dados, pauta 52; `coletores/tce_rs.py --orgaos 54907`, `tratamento/dmae_cheias.py`, fichas `dmae-*`.
+- **Memória consultada antes da mudança:** main 72c4469 (sem entradas sobre o tema) e ramo bd90cf2 (PORTOALEGRE-2026-002 a 004).
+- **Sintoma:** comunicados da Prefeitura deram para a mesma etapa um investimento em junho/agosto/setembro e outro, maior, na entrega (24/11/2026). A regra do projeto proíbe número sem ficha.
+- **Testes e resultado:** (1) o arquivo do LicitaCon que já tínhamos é só da Prefeitura (órgão 54900); autarquias têm código próprio: DMAE = 54907 (achado pela API CKAN `dados.tce.rs.gov.br/api/3/action/package_search?q=DMAE`). (2) No DMAE, a compra das bombas flutuantes confere com o comunicado (dispensa 4/2026, 17 bombas, vazão somada igual à anunciada). (3) O contrato das obras civis do dique e das comportas (junho a agosto de 2026) não está nem no 54907 nem no 54900. Causas possíveis, não demonstradas: contratação por outro órgão (Estado, Funrigs), registro atrasado ou objeto descrito sem as palavras buscadas.
+- **Correção editorial:** a matéria publica só os valores com ficha (bombas e licitação da EBAP 10), diz que o custo total não pôde ser conferido e que os comunicados divergem, sem repetir os números; a pauta exige pergunta ao DMAE antes de publicar.
+- **Armadilhas da base:** campo de valor com percentual de desconto (1,08) em pregão de manutenção: valores abaixo de R$ 1.000 ficam vazios; itens trazem a vazão na descrição ("1.000 l/s"); dispensa de 2024 sobre "diques de terra da região norte" é de projetos, não de obra (ler o objeto inteiro antes de resumir).
+- **Motor:** `texto()` agora escreve AAAA-MM-DD por extenso nas frases das fichas.
+- **Próxima ocorrência:** obra pública com valor em comunicado: procurar o contrato no LicitaCon do órgão executor certo (lista de órgãos pela API CKAN), comparar com o comunicado e, se não achar, dizer que não foi localizado e perguntar ao órgão antes de publicar.
 
