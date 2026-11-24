@@ -1,0 +1,84 @@
+{
+  "formato": "pandora-bom/1",
+  "kit": "1.0.0",
+  "projeto": "pandora-memoria-tecnica",
+  "gerado_em": "2026-11-24T10:56:25+00:00",
+  "base": "72c4469c0412376c749a519e881ff582baa74a8f",
+  "head": "f61d1252b22c50d8d6ddc1ef60a3e0b8a3b01f96",
+  "commits": [
+    {
+      "sha": "f61d1252b22c50d8d6ddc1ef60a3e0b8a3b01f96",
+      "autor": "Claude",
+      "data": "2026-11-24T10:56:24+00:00",
+      "titulo": "MEMORIA: retificação ORQUESTRADOR-2026-015, schema ao vivo confere com o fixture",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01PLQo94GQopHUk15BZQKKw2"
+      ]
+    }
+  ],
+  "ia": {
+    "agentes": [
+      "Claude"
+    ],
+    "sessoes": [
+      "https://claude.ai/code/session_01PLQo94GQopHUk15BZQKKw2"
+    ],
+    "commits_com_ia": 1,
+    "commits": 1
+  },
+  "arquivos": [
+    {
+      "caminho": "MEMORIA.md",
+      "estado": "M",
+      "sha256": "87c45c2771afa24c9ebe86362cf34fc5c9dc33bd78a233eba6b876faf0983834"
+    }
+  ],
+  "especificacao": {
+    "itens": [],
+    "sem_spec": "retificação datada de caso existente na memória, sem código."
+  },
+  "memoria": {
+    "commit": "72c4469c0412376c749a519e881ff582baa74a8f"
+  },
+  "portao": {
+    "aprovado": true,
+    "itens": [
+      {
+        "id": "G1",
+        "status": "aprovado"
+      },
+      {
+        "id": "G2",
+        "status": "aprovado"
+      },
+      {
+        "id": "G3",
+        "status": "aprovado"
+      },
+      {
+        "id": "G4",
+        "status": "aprovado"
+      },
+      {
+        "id": "G5",
+        "status": "aprovado"
+      },
+      {
+        "id": "G6",
+        "status": "aprovado"
+      },
+      {
+        "id": "G7",
+        "status": "aprovado"
+      }
+    ]
+  },
+  "aprovacao_humana": {
+    "tipo": "pull_request",
+    "estado": "pendente",
+    "nota": "A aprovação humana é o review e o merge deste PR no GitHub."
+  }
+}
