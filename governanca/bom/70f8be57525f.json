@@ -1,0 +1,84 @@
+{
+  "formato": "pandora-bom/1",
+  "kit": "1.0.0",
+  "projeto": "pandora-memoria-tecnica",
+  "gerado_em": "2026-11-24T20:58:44+00:00",
+  "base": "72c4469c0412376c749a519e881ff582baa74a8f",
+  "head": "70f8be57525f7e7c83ba2048bb04855d608efe94",
+  "commits": [
+    {
+      "sha": "70f8be57525f7e7c83ba2048bb04855d608efe94",
+      "autor": "Claude",
+      "data": "2026-11-24T20:58:43+00:00",
+      "titulo": "Memória: lições da sessão Porto Alegre em Dados (WPVibe 526, ITBI, Commons 429, gerador, GEO Score)",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    }
+  ],
+  "ia": {
+    "agentes": [
+      "Claude"
+    ],
+    "sessoes": [
+      "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+    ],
+    "commits_com_ia": 1,
+    "commits": 1
+  },
+  "arquivos": [
+    {
+      "caminho": "MEMORIA.md",
+      "estado": "M",
+      "sha256": "b3631582a96f8d410a91bedf02d8bb9bdcf82628bd5ee1e987139f63f3924240"
+    }
+  ],
+  "especificacao": {
+    "itens": [],
+    "sem_spec": "registro de memória técnica (documentação), sem mudança de código."
+  },
+  "memoria": {
+    "commit": "72c4469"
+  },
+  "portao": {
+    "aprovado": true,
+    "itens": [
+      {
+        "id": "G1",
+        "status": "aprovado"
+      },
+      {
+        "id": "G2",
+        "status": "aprovado"
+      },
+      {
+        "id": "G3",
+        "status": "aprovado"
+      },
+      {
+        "id": "G4",
+        "status": "aprovado"
+      },
+      {
+        "id": "G5",
+        "status": "aprovado"
+      },
+      {
+        "id": "G6",
+        "status": "aprovado"
+      },
+      {
+        "id": "G7",
+        "status": "aprovado"
+      }
+    ]
+  },
+  "aprovacao_humana": {
+    "tipo": "pull_request",
+    "estado": "pendente",
+    "nota": "A aprovação humana é o review e o merge deste PR no GitHub."
+  }
+}
