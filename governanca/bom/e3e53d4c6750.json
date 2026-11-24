@@ -1,0 +1,86 @@
+{
+  "formato": "pandora-bom/1",
+  "kit": "1.0.0",
+  "projeto": "pandora-memoria-tecnica",
+  "gerado_em": "2026-11-24T05:05:00+00:00",
+  "base": "72c4469c0412376c749a519e881ff582baa74a8f",
+  "head": "e3e53d4c6750d19ad26f540afb22a877eade28a0",
+  "commits": [
+    {
+      "sha": "e3e53d4c6750d19ad26f540afb22a877eade28a0",
+      "autor": "Claude",
+      "data": "2026-11-24T05:04:59+00:00",
+      "titulo": "Retificação GOVERNANCA-2026-001: main em todos os repositórios e falhas já existentes no Cloud",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01PLQo94EZS329tmdy4fduE2"
+      ]
+    }
+  ],
+  "ia": {
+    "agentes": [
+      "Claude"
+    ],
+    "sessoes": [
+      "https://claude.ai/code/session_01PLQo94EZS329tmdy4fduE2"
+    ],
+    "commits_com_ia": 1,
+    "commits": 1
+  },
+  "arquivos": [
+    {
+      "caminho": "MEMORIA.md",
+      "estado": "M",
+      "sha256": "adba44c23e5b1175f26fe5f59bb051c0f224a316b6ff6a08f10c2259d8609635"
+    }
+  ],
+  "especificacao": {
+    "itens": [
+      "SPEC-GOV-10@pandora-saas-forge"
+    ],
+    "sem_spec": null
+  },
+  "memoria": {
+    "commit": "72c4469"
+  },
+  "portao": {
+    "aprovado": true,
+    "itens": [
+      {
+        "id": "G1",
+        "status": "aprovado"
+      },
+      {
+        "id": "G2",
+        "status": "aprovado"
+      },
+      {
+        "id": "G3",
+        "status": "aprovado"
+      },
+      {
+        "id": "G4",
+        "status": "aprovado"
+      },
+      {
+        "id": "G5",
+        "status": "aprovado"
+      },
+      {
+        "id": "G6",
+        "status": "aprovado"
+      },
+      {
+        "id": "G7",
+        "status": "aprovado"
+      }
+    ]
+  },
+  "aprovacao_humana": {
+    "tipo": "pull_request",
+    "estado": "pendente",
+    "nota": "A aprovação humana é o review e o merge deste PR no GitHub."
+  }
+}
