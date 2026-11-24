@@ -596,3 +596,25 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - **PRs:** saas-forge #7 (fonte, juntar primeiro), cloud #298, corpo #166, competitor-discovery #14, saas-base #23, visual #2, glossário #3 e o PR desta memória.
 - **Limites:** aprovação humana fica "pendente" no BOM (o merge é a aprovação); sem tokens/custo por sessão; PRs simultâneos conflitam no `registro.jsonl` (ficar com o principal e rodar `registrar` de novo).
 - **Próxima ocorrência:** portão reprovou? Leia o detalhe do G-ID. G2: acrescente a dependência ao contrato no mesmo PR, com motivo. G5: regenere pela fonte. G6: cite `SPEC-…`/`Sem spec: …` e `Memória: <commit>`. Kit desatualizado: `instalar --checar` sai 1.
+
+### 2026-11-24 · Retificação GOVERNANCA-2026-001 — `main` em todos os repositórios e falhas já existentes no Cloud
+- **Padronização das branches (SPEC-GOV-10@pandora-saas-forge):**
+  - saas-forge: o `main` antigo era ancestral do ramo padrão; avançado (fast-forward) até `605c873`. Os PRs abertos #6, #4, #2 e #1 foram redirecionados para `main`. PR #8 aponta o kit para `main`.
+  - visual: o `main` não existia; criado no mesmo commit do ramo padrão. PR #3.
+  - saas-base: o `main` e o ramo padrão **tinham divergido**. Só no `main` havia 10 commits (PRs #9, #10, #11 e #15: Tarefas/QUADRO, Navegação ⌘K, `sync_motores.py`, dependências do Dependabot, cerca de 2.700 linhas). Só no ramo padrão havia Ajuda/atendimento (#19), inteligência de documentos e governança (#23). Juntados por merge no PR #24. Conflitos só no `MODULES` padrão, mantidos os dois: `notes,tarefas,support`; `novo_cliente` liga `<modulo>,tarefas,support` e reserva o nome `tarefas`. `pytest`: 55 aprovados e 1 pulado.
+  - Achado: `ci.yml` do forge e `ci.yml`/`security.yml` do saas-base já filtravam `push: [main]`. Com outro ramo padrão, **o CI de push nunca rodou na linha real**.
+  - Pendências do dono: trocar o ramo padrão em Settings; confirmar no Render de qual ramo o `pandora-saas` publica; depois do merge do #24, redirecionar para `main` os PRs #22, #21, #20, #14, #13 e #12 do saas-base; apagar os ramos antigos.
+  - Tentativa recusada: `git push -f` foi bloqueado pelo classificador. O push normal bastava, porque as branches novas partiam de pontos que já continham o trabalho anterior. Não use force em reestruturação de ramos.
+- **pandora-cloud, CI local do PR #298:** 11 aprovados, 1 com falha, 8 pulados. O job `test` parou em `pandora_grafismo/sync.py --check` (`web.py` fora de sincronia). Os passos seguintes foram rodados à mão em `b256b2f` (antes do kit) e em `06febf1` (depois):
+  - `unittest` (2122 testes): **as mesmas** 7 falhas e 2 erros nos dois;
+  - pytest do orquestrador: 220 aprovados; `demo.py` OK.
+  - Falhas já existentes, sem PR de correção:
+    - `test_linha_do_tempo.Pdf`: `KeyError: 'converta'`;
+    - `test_coleta_mensal_e_serie_anual` (Dominio e Pdf);
+    - `test_painel_admin.test_gerar_ilimitado_e_ver_todos_os_scores` (Painel e BackupNoPainel);
+    - `test_schema_admin.test_cliente_nao_seleciona_schema` (`10 != 9`);
+    - cópia do `PANDORA_BLOG` diverge do manifesto;
+    - `test_grafismo_package` (mesma causa do `sync.py`).
+  - O passo de sincronia vem antes do `unittest` no `ci.yml`. Por isso, uma falha nele esconde o resultado da suíte inteira.
+  - Comentário com as duas execuções: pandora-cloud#298.
+- **Próxima ocorrência:** antes de trocar o ramo padrão, confira se o `main` existe e se divergiu (`git rev-list --left-right --count origin/main...origin/<padrão>`). Se o job `test` do Cloud parar num `--check`, rode os passos restantes à mão no `main` antes de concluir qualquer coisa sobre a suíte.
