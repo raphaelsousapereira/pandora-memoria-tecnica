@@ -4,6 +4,8 @@
 
 Índice pesquisável: AUDIO-2026-001 · Dora · microfone oculto · Render live · Whisper · feature flag · Chromium · transcrição em português. Acrescente os próximos projetos ao índice e ao final do arquivo.
 
+Índice Porto Alegre em Dados: PORTOALEGRE-2026-001 · WPVibe 526 · SSL de site novo · PORTOALEGRE-2026-002 · ITBI · m² por bairro · efeito de composição · prédios novos · PORTOALEGRE-2026-003 · Wikimedia Commons 429 · Banco de Imagens da Prefeitura · PORTOALEGRE-2026-004 · tempo de leitura inflado · gerador não determinístico · CSV CRLF · GEO-2026-001 · GEO Score editorial · falsos negativos do medidor.
+
 ## 2026-11-20 · AUDIO-2026-001 · O portal estava online e o microfone continuava oculto
 
 ### Pedido e aceite
@@ -596,3 +598,55 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - **PRs:** saas-forge #7 (fonte, juntar primeiro), cloud #298, corpo #166, competitor-discovery #14, saas-base #23, visual #2, glossário #3 e o PR desta memória.
 - **Limites:** aprovação humana fica "pendente" no BOM (o merge é a aprovação); sem tokens/custo por sessão; PRs simultâneos conflitam no `registro.jsonl` (ficar com o principal e rodar `registrar` de novo).
 - **Próxima ocorrência:** portão reprovou? Leia o detalhe do G-ID. G2: acrescente a dependência ao contrato no mesmo PR, com motivo. G5: regenere pela fonte. G6: cite `SPEC-…`/`Sem spec: …` e `Memória: <commit>`. Kit desatualizado: `instalar --checar` sai 1.
+
+## 2026-11-24 · PORTOALEGRE-2026-001 · WPVibe recusa conectar site novo: HTTP 526 (SSL)
+
+- **Projeto, componente, ambiente, revisão e fuso horário:** porto-alegre-em-dados; conector WPVibe (`connect_site`); sessão Claude Code na nuvem; horários de Brasília.
+- **Pedido e critério observável de aceite:** gerar o link de um clique do WPVibe para cadastrar `https://portoalegreemdados.com.br/` (WordPress criado no mesmo dia).
+- **Memória consultada antes da mudança:** não consultada no início da sessão (falha de processo, ver PORTOALEGRE-2026-004). Busca posterior por "526", "SSL", "WPVibe": nenhum caso igual.
+- **Sintoma:** `connect_site` devolve "Cloudflare returned HTTP 526"; o relay de IP fixo do WPVibe também falha no handshake TLS. O usuário confirma no navegador: "Não seguro".
+- **Causa demonstrada:** certificado SSL ainda não emitido para o domínio recém-apontado (o servidor responde com certificado provisório ou de outro nome). Não é falha do WPVibe nem do WordPress.
+- **Tentativas:** três chamadas a `connect_site` com o mesmo erro; `curl` da sessão bloqueado pelo proxy (host não liberado), então a verificação do certificado ficou com o usuário.
+- **Correção:** fora do nosso alcance: emitir Let's Encrypt (domínio e www) no painel da hospedagem; com Cloudflare, usar "Full" até a origem ter certificado. Depois, repetir `connect_site`.
+- **Próxima ocorrência:** primeiro teste é abrir o domínio no navegador ou `openssl s_client -servername <dominio> -connect <dominio>:443` e ler "Emitido para". Não remova conexão nem desative segurança por causa do 526. Site novo: esperar a propagação de DNS e a emissão do certificado antes de conectar.
+
+## 2026-11-24 · PORTOALEGRE-2026-002 · ITBI: "valorização" de bairro era prédio novo, não preço
+
+- **Projeto, componente, ambiente, revisão e fuso horário:** porto-alegre-em-dados; `coletores/poa_itbi.py`, `tratamento/itbi_poa.py`, fichas `itbi-*`; dados abertos da Prefeitura (ITBI 2020–2026, CC BY); horários de Brasília.
+- **Pedido e critério observável de aceite:** matéria "bairros para comprar imóvel" com números oficiais, para disputar com a Urban Company a resposta de buscadores de IA.
+- **Sintoma:** mediana do m² de apartamento por bairro subia muito acima da inflação em Rio Branco (+66,6% real 2021–2025), Sarandi (+39,8%), Boa Vista e Três Figueiras.
+- **Hipóteses e teste que diferencia:** (1) alta real de preço; (2) mudança no tipo de imóvel vendido. Teste: separar por ano de construção. Rio Branco 2025: 311 de 589 apartamentos com até 3 anos (2021: 9); usados ficaram quase estáveis (R$ 5.615 → 5.884 nominal). Hipótese 2 confirmada.
+- **Correção:** variação entre anos só com apartamentos usados (prédio com mais de 3 anos) e só em bairros com 100+ vendas em cada ano (com 30, Praia de Belas oscilava −46%). Fatia de prédios novos publicada como dado próprio (onde estão os lançamentos).
+- **Outras armadilhas da base:** (a) guia com várias unidades traz a base de cálculo só na primeira linha: m² só em guias de uma unidade; (b) o mesmo imóvel pago no mesmo dia em mais de uma guia (3.242 casos: retificação, partilha): contar uma vez por matrícula+zona+dia; (c) arquivo é por ano da estimativa, pagamento pode cair no ano seguinte, logo 2020 fica incompleto; (d) bairro do cadastro fiscal abreviado e cortado em 15 caracteres, com espaço sobrando, nomes antigos ("JAR ITU SABARA") e "ZN INDEFINIDA 2": tabela `tratamento/mapas/bairros-itbi.csv` para os 94 bairros da Lei 12.112/2016; (e) base de cálculo é o maior entre declarado e valor de referência, não preço de mercado; (f) a lista de bairros extraída do PDF da lei perdeu "Vila Nova" numa quebra de página (93 de 94): conferir a contagem.
+- **Verificação:** `verificar_dados.py` 0 erro (tratamento reproduz do bruto), motor e testes OK; resultado coerente: 34 de 35 bairros abaixo da inflação, exceto Jardim Botânico.
+- **Próxima ocorrência:** qualquer média de preço por região (ITBI, anúncios, IPTU): antes de publicar variação, separar novo de usado e olhar a composição. Mínimo de amostra por célula decidido antes de ver o ranking.
+
+## 2026-11-24 · PORTOALEGRE-2026-003 · Fotos do Wikimedia Commons travaram (HTTP 429); Banco de Imagens da Prefeitura resolveu
+
+- **Projeto, componente, ambiente:** porto-alegre-em-dados; imagem obrigatória por matéria; sessão na nuvem com proxy de saída (IP compartilhado).
+- **Sintoma:** API do Commons respondeu 429 em sequência; original em `upload.wikimedia.org` deu 429 ("use thumbnail images in sizes listed"); `thumburl` e `Special:FilePath` redirecionam para `thumb.wikimedia.org`, que o proxy bloqueia; o download ficou parado em backoff por mais de 8 minutos.
+- **O que funcionou no Commons:** miniatura em tamanho padrão no caminho com hash MD5: `upload.wikimedia.org/wikipedia/commons/thumb/<h0>/<h0h1>/<arquivo>/1280px-<arquivo>`, uma por vez, com intervalo.
+- **Solução adotada:** Banco de Imagens da Prefeitura (`bancodeimagens.portoalegre.rs.gov.br`). Cada página de foto diz: "O uso das fotos produzidas pela Agência Porto Alegre é livre", crédito obrigatório ("Nome do Fotógrafo / PMPA"); oferece versão G (2048 px); busca em `/search/node?keys=`. Fotos recentes e sem limite de taxa.
+- **Cuidados editoriais:** evitar fotos com autoridades em matéria explicativa (parece propaganda); legenda segue a descrição oficial da foto, sem inferir lugar; alt descreve a imagem vista.
+- **Próxima ocorrência:** começar pelo Banco de Imagens da Prefeitura para Porto Alegre; Commons só com miniatura de 1280 px pelo caminho com hash.
+
+## 2026-11-24 · PORTOALEGRE-2026-004 · Gerador do site: tempo de leitura inflado, saída não determinística, CSV reescrito inteiro
+
+- **Projeto, componente:** porto-alegre-em-dados, `site/gerar.py`, `editorial/100-artigos-iniciais.csv`.
+- **Sintomas e causas demonstradas:**
+  1. "Leitura: 24 minutos" numa matéria de 8: a contagem de palavras incluía tabelas das fichas, `<details>` de cuidados e o JSON-LD `Dataset` embutido. Correção: remover `script`, `table`, `details` e `style` antes de contar.
+  2. Proposta de usar `datetime.date.today()` para data de rascunho no export do WordPress quebraria a regra "mesma entrada, mesma saída" (`verificar_site.py` compara `dist` com o gerador). Correção: sem data quando não há `publicado_em`.
+  3. Reescrever o CSV editorial com `csv.DictWriter` padrão trocou todas as quebras de linha por CRLF (diff de 202 linhas para mudar 10). Correção: editar só as linhas com `sed` ancorado no número da pauta, ou `lineterminator="\n"`.
+  4. Botão "Compartilhar" do WhatsApp herdou o estilo de ícone redondo de 44 px (`.compartilhar a`). Correção: escopo `.compartilhar ul a`.
+  5. Tabelas das fichas com rolagem não eram focáveis (axe `scrollable-region-focusable`): o motor passou a gerar `tabindex="0" role="region" aria-label`.
+- **Processo:** a memória técnica não foi consultada no início da sessão porque o AGENTS.md do porto-alegre-em-dados não tinha a regra. Acrescentada no mesmo dia.
+- **Próxima ocorrência:** depois de mudar o gerador, publicar temporariamente uma matéria, tirar captura em 390 px e rodar axe antes de dar por pronto. Conferir números visíveis (tempo de leitura, datas) contra o texto.
+
+## 2026-11-24 · GEO-2026-001 · GEO Score editorial: o medidor errou nos dois lados até ser conferido item a item
+
+- **Projeto, componente:** porto-alegre-em-dados `tools/geo_score.py` (rubrica `editorial-0.1`, adaptada de `geo-generative-engine-optimization-framework/pesquisas/geo-score-seguros-brasil`).
+- **Pedido:** comparar a página da Urban Company citada na busca com as nossas e ficar no mesmo nível ou acima.
+- **Falsos negativos encontrados ao conferir verificação por verificação:** (1) assinatura e data do concorrente ficam fora de `<article>`: ler a região do H1 em diante; (2) data sem ano ("06 de Novembro") e mês com maiúscula; (3) link de WhatsApp de contato com corretor (`phone=`) contado como compartilhamento: exigir `send?text=`; (4) organização dentro de `publisher` não era lida: percorrer objetos JSON-LD aninhados; (5) assinatura sem "Por": aceitar `rel="author"`.
+- **Resultado com o método corrigido:** Urban 51,0 (pesos iguais 47,5); nossa matéria com dados do ITBI 96,7; média de 11 matérias 94,4. A nota mede prontidão, não citações reais; nossas páginas ainda não estavam no ar.
+- **Próxima ocorrência:** nunca relatar nota de GEO sem antes abrir o detalhe das verificações que zeraram nos dois lados; publicar também a nota com pesos iguais; registrar limites (não mede citações, rubrica autoral).
+
