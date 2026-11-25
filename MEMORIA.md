@@ -750,3 +750,13 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Nova evidência: com a rede liberada para Meio, Nexo, Intercept, Pública, CartaCapital e Sumaúma (aprovação do usuário), foram lidos mais 19 textos: 10 da CartaCapital, 6 da Pública e 3 da Sumaúma. O total chegou a 30. O Intercept responde 403 e não foi contornado. O Meio publica resumo de notícias, não coluna, e ficou fora. A página de colunas do Nexo não existe no endereço testado.
 - Correção do entendimento: nenhum dos textos usa todos os movimentos do arco. Exigir os sete em todo texto era erro. O modelo virou núcleo (achado, prova, cuidado) mais camadas escolhidas por tipo de texto. O `narrativa_score.py --tipo` só cobra as camadas pedidas.
 - Armadilha de coleta: o HTML dos veículos traz bio do autor, pedidos de apoio e rodapés repetidos como `<p>`. Descarte os parágrafos que se repetem entre textos do mesmo veículo e corte nos pedidos de apoio antes de contar traços.
+
+## 2026-11-25 · PORTOALEGRE-2026-013 · FAQ subaproveitado e sem FAQPage; edição em massa de posts pelo WPVibe
+
+- Projeto: Porto Alegre em Dados, `site/gerar.py` (`com_faq_ld`), `editorial/alma-pandora.md`; commits 4949ff2 e 6fe8023.
+- Sintoma: as 19 matérias publicadas tinham 0 a 4 perguntas frequentes (11 guias sem nenhuma) e nenhum JSON-LD `FAQPage`.
+- Correção: 110 perguntas novas, com respostas tiradas só do texto e das fichas de cada matéria. O gerador cria o `FAQPage` a partir de `<h2 id="perguntas">` (cada `<h3>` e o `<p>` seguinte), no site e no WordPress. Regra: 6 a 10 perguntas, ou 4 a 8 em respostas rápidas; não repetir intertítulo literalmente; uma resposta, um parágrafo.
+- Armadilha 1: o difflib sobre o `materias.json` inteiro leva minutos e não serve de âncora. O ícone de relógio é SVG no arquivo e `pi-relogio` no WordPress. Use âncoras curtas e conhecidas: `<span>Leitura: N minutos</span>` e os ~60 caracteres antes de `<h2 id="fontes">Fontes</h2>`. Aplique tudo em lote por post (`edits`).
+- Armadilha 2: JSON-LD com `indent=2` dobra o tamanho de cada edição. Use `separators=(",", ":")`.
+- Armadilha 3: depois de um reinício do worker, uma chamada pode não ter rodado. Confira com `db query "SELECT LOCATE('<id novo>', post_content) ..."` antes de reenviar. Reenviar é seguro, porque a âncora antiga deixa de existir depois da edição.
+- Verificação: o `FAQPage` das 19 páginas publicadas foi lido e tem o mesmo número de perguntas do arquivo local. O post 164 tem MD5 igual ao local. O IndexNow aceitou as 19 URLs. Uma página respondeu devagar e passou na segunda tentativa: aumente o timeout antes de concluir que houve falha.
