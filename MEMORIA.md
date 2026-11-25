@@ -677,3 +677,16 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Recuperação, efeitos colaterais e como reconhecer regressão: se os ícones sumirem, o snippet #61 está desligado. Bloco "inválido" no editor indica `&` cru. Frase de ficha citando um item ausente da tabela indica `max_linhas` curto.
 - Próxima ocorrência: checar `wordpress/enviados.json` e editar os posts existentes. Testar antes de enviar: `href` com `&` cru e frase da ficha contra as linhas da tabela.
 - Links de evidência revisados, PR, deploy, data e responsável pela confirmação: commit f897741 em porto-alegre-em-dados, ramo claude/portoalegreemdados-wpvibe-signup-s9bciv; confirmação visual pendente com o editor.
+
+## 2026-11-25 · PORTOALEGRE-2026-007 · IndexNow (plugin do Bing): "Invalid API Key" com a chave mascarada do plugin
+
+- Projeto, componente, ambiente, revisão e fuso horário: Porto Alegre em Dados, plugin `indexnow` do Bing Webmaster Tools 1.0.4 no WordPress 7.1.5, operado pelo WPVibe; repositório porto-alegre-em-dados 8f7d9ac; America/Sao_Paulo.
+- Pedido e critério observável de aceite: enviar ao Bing todas as URLs públicas do site (home, 7 políticas, 12 matérias, 10 editorias) e ver cada envio aprovado no plugin.
+- Memória consultada antes da mudança (commit e IDs): PORTOALEGRE-2026-006 (envio via WPVibe), ORQUESTRADOR-2026-015 (escrita só por `rest_api_write`). Nenhum caso de IndexNow.
+- Sintoma: reabrir e salvar posts não gerava envio (o envio automático só vale para mudanças de status depois de ativado). `POST /indexnow/v_1.0.4/submitUrl` respondia "Invalid API Key".
+- Causa demonstrada: a chave que o plugin devolve em `apiSettings` vem mascarada, e reenviá-la grava a máscara. Definir uma chave nova de 32 hex por `POST /indexnow/v_1.0.4/apiKey {"APIKey":"<chave>"}` faz o plugin servir `/<chave>.txt` na raiz (200 text/plain), e a partir daí `submitUrl` responde `{"error":""}`.
+- Correção: chave própria definida pela rota `apiKey` (chaves IndexNow são públicas por definição) e registrada em `wordpress/enviados.json`. Envio de uma URL por chamada a `submitUrl`.
+- Verificação: `getStats` deu PassedSubmissionCount 30 e FailedSubmissionCount 0; `allSubmissions` lista cada URL com "Success". O arquivo da chave responde 200.
+- Limites: "Success" quer dizer que o endpoint IndexNow aceitou o envio. Não garante indexação. Não houve verificação no Bing Webmaster Tools, que fica com o dono do site.
+- Próxima ocorrência: em outro site com o mesmo plugin, gerar chave própria (`secrets.token_hex(16)`), gravar via `apiKey`, conferir `/<chave>.txt` e então enviar. Python urllib leva 406 do filtro de bots deste host; curl funciona.
+- Evidência: commit 8f7d9ac em porto-alegre-em-dados, ramo claude/portoalegreemdados-wpvibe-signup-s9bciv.
