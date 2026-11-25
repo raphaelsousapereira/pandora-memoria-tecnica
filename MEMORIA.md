@@ -734,3 +734,12 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Armadilha de interpretação: a mediana da folha da classe I (R$ 5.087,86) fica acima do subsídio de 2026 (95% de R$ 4.188,09). A lei garante uma parcela de equivalência individual a quem veio da carreira antiga, mas a folha não separa essa parcela. O texto não atribui a diferença a ela; diz que não dá para saber quanto vem dela.
 - Motor: `tabela` ganhou o parâmetro `limite` (as N primeiras linhas depois de ordenar), com teste.
 - Próxima ocorrência: cargo com nome novo ou duplicado na folha pede busca da lei de carreira no SAPL antes de comparar. Valores de lei entram citados com artigo e anexo.
+
+## 2026-11-25 · PORTOALEGRE-2026-012 · GEO alto não é texto memorável: arco narrativo e Narrativa Score
+
+- Projeto: Porto Alegre em Dados, `editorial/alma-pandora.md`, `tools/narrativa_score.py`, rascunhos de "a cada R$ 100" em `editorial/rascunhos/`; commit 85db60f.
+- Sintoma: as matérias passavam no GEO Score (90+) e seguiam todas o mesmo molde (pergunta → resposta → prova → cuidado). O texto era citável, mas faltavam três coisas: por que ler agora, contraste entre números e um fecho. O cuidado que muda a leitura ficava no fim.
+- Tentativa limitada: o pedido era ler 30 colunas dos maiores colunistas. Folha, O Globo, Estadão, GZH, UOL, Correio do Povo, El País e Poder360 recusam leitura automatizada. Meio, Nexo, Intercept, Pública e CartaCapital não estão na lista de hosts do ambiente. Foram lidos 11 textos (Brasil de Fato e Matinal). Não contorne bloqueio; peça ao editor colunas coladas ou a liberação dos hosts.
+- Correção: o arco de sete movimentos (gancho, achado, contraste, escala humana, virada, consequência, eco) tem tabela de contexto: completo para explicativos e reportagens, leve para guias, nenhum para fichas e políticas. O checklist virou `tools/narrativa_score.py`, que lê só o texto a partir do `<p class="resumo">`; antes dele há migalhas e autoria, e o primeiro teste dava falso negativo.
+- Evidência: mesmos dados e fontes, GEO 90,4 → 93,0 (só "evidências", por nomear o IBGE) e Narrativa 25 → 100. As seis matérias publicadas ficam entre 55 e 90. O GEO não mede narrativa; não use o GEO para julgar se o texto melhorou.
+- Próxima ocorrência: matéria nova passa pelos dois scores. Escala humana vem de ficha (por morador, por dia); personagem só com entrevista real. Contraste só entre números da mesma base.
