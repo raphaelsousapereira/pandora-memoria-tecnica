@@ -701,3 +701,17 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Armadilha: `href="#top"` é válido pelo HTML (sobe ao topo sem âncora), mas o `tools/verificar_site.py` acusava âncora inexistente; o verificador agora aceita `#top`.
 - Verificação: render em Chromium a 1366 e 390 px sem rolagem horizontal; verificar_site com 0 erro em 120 páginas. Teste de render com `loading="lazy"` via `setContent` não carrega a imagem: troque por eager só no teste.
 - Próxima ocorrência: começar por este padrão e trocar só a marca, a cor da ação e as colunas.
+
+## 2026-11-25 · PORTOALEGRE-2026-009 · Glossário público ligado às páginas do site e do WordPress
+
+- Projeto, componente: Porto Alegre em Dados; `site/termos.py`, `tools/sync_glossario.py`, cópia em `site/glossario/`; página WordPress 116; repositório porto-alegre-em-dados 18e6b61. Fonte: raphaelsousapereira/glossario-porto-alegre-em-dados 99fd5aa (30 verbetes em `verbetes.md`, índice de 400 termos no README).
+- Pedido: usar o glossário em todas as páginas.
+- Memória consultada: PORTOALEGRE-2026-006 (envio por partes e `content/edit`) e PORTOALEGRE-2026-008 (padrão visual).
+- Decisão: cópia versionada com SHA-256, no modelo das cópias de motores PANDORA (o verificador falha se alguém editar à mão). Liga só a primeira ocorrência de cada termo, e só em `p`, `li` e `dd`; títulos, links, tabelas, legendas, `nav` e `aside` ficam de fora. Cada matéria ganha o quadro "Termos desta matéria", e o site ganha a página `/glossario/` com JSON-LD `DefinedTermSet` e `DefinedTerm`.
+- Armadilha 1: o conteúdo publicado no WordPress diverge do gerado. As matérias publicadas depois ganharam ícone e data de publicação, e o `wordpress_envio.compactar` não conhece o ícone de calendário. Por isso o diff "antes e depois" a partir do repositório não serve.
+- Saída da armadilha 1: aplicar `termos.ligar` sobre o HTML público (curl, sem gastar contexto) e mandar só os trechos de texto alterados por `content/edit` em lote. Se o trecho se repete (ex.: "Cadastro Único" sozinho num `strong`), alargue com as tags vizinhas até ficar único. O lote é tudo-ou-nada, então um trecho divergente só faz a chamada falhar.
+- Armadilha 2: o verificador de âncoras lê os `@id` do JSON-LD. Um `#glossario` sem elemento correspondente gerou 30 erros. O `@id` do conjunto passou a ser a própria URL.
+- Armadilha 3: no WordPress a página não tem a classe `.glossario`. Os estilos dos verbetes usam só `.verbete`.
+- Verificação: página 116 com MD5 igual ao local (cf212877…) e publicada em /glossario/ (200, 30 verbetes, JSON-LD sem `<br>`); 11 matérias e 2 políticas com termos; verificar_site com 0 erro em 121 páginas; IndexNow aceitou a URL.
+- Pendências: CSS no WPCode #70 e link no rodapé #65 aguardam aprovação. Sem esse CSS, o termo aparece como link comum e o quadro fica sem moldura.
+- Próxima ocorrência: verbete novo → sync, gerar e atualizar a página 116; matéria nova já sai com os termos.
