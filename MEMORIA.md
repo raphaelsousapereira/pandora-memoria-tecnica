@@ -743,3 +743,10 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Correção: o arco de sete movimentos (gancho, achado, contraste, escala humana, virada, consequência, eco) tem tabela de contexto: completo para explicativos e reportagens, leve para guias, nenhum para fichas e políticas. O checklist virou `tools/narrativa_score.py`, que lê só o texto a partir do `<p class="resumo">`; antes dele há migalhas e autoria, e o primeiro teste dava falso negativo.
 - Evidência: mesmos dados e fontes, GEO 90,4 → 93,0 (só "evidências", por nomear o IBGE) e Narrativa 25 → 100. As seis matérias publicadas ficam entre 55 e 90. O GEO não mede narrativa; não use o GEO para julgar se o texto melhorou.
 - Próxima ocorrência: matéria nova passa pelos dois scores. Escala humana vem de ficha (por morador, por dia); personagem só com entrevista real. Contraste só entre números da mesma base.
+
+## 2026-11-25 · Retificação de PORTOALEGRE-2026-012 · De arco fixo para núcleo e camadas
+
+- Projeto: Porto Alegre em Dados, commit 12be577.
+- Nova evidência: com a rede liberada para Meio, Nexo, Intercept, Pública, CartaCapital e Sumaúma (aprovação do usuário), foram lidos mais 19 textos: 10 da CartaCapital, 6 da Pública e 3 da Sumaúma. O total chegou a 30. O Intercept responde 403 e não foi contornado. O Meio publica resumo de notícias, não coluna, e ficou fora. A página de colunas do Nexo não existe no endereço testado.
+- Correção do entendimento: nenhum dos textos usa todos os movimentos do arco. Exigir os sete em todo texto era erro. O modelo virou núcleo (achado, prova, cuidado) mais camadas escolhidas por tipo de texto. O `narrativa_score.py --tipo` só cobra as camadas pedidas.
+- Armadilha de coleta: o HTML dos veículos traz bio do autor, pedidos de apoio e rodapés repetidos como `<p>`. Descarte os parágrafos que se repetem entre textos do mesmo veículo e corte nos pedidos de apoio antes de contar traços.
