@@ -715,3 +715,12 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Verificação: página 116 com MD5 igual ao local (cf212877…) e publicada em /glossario/ (200, 30 verbetes, JSON-LD sem `<br>`); 11 matérias e 2 políticas com termos; verificar_site com 0 erro em 121 páginas; IndexNow aceitou a URL.
 - Pendências: CSS no WPCode #70 e link no rodapé #65 aguardam aprovação. Sem esse CSS, o termo aparece como link comum e o quadro fica sem moldura.
 - Próxima ocorrência: verbete novo → sync, gerar e atualizar a página 116; matéria nova já sai com os termos.
+
+## 2026-11-25 · PORTOALEGRE-2026-010 · Ficha "atual" desatualizada: a estimativa de população de 2026 já existia
+
+- Projeto: Porto Alegre em Dados, coletor `coletores/ibge.py`, fichas `populacao-poa` e `populacao-capitais-ranking`; commit 9ba1075 em porto-alegre-em-dados.
+- Sintoma: na matéria "Qual é a população de Porto Alegre?", a ficha dizia 2025 (1.388.794), mas o IBGE publicou a estimativa de 2026 (1.388.791) em 27/8/2026. O coletor pedia períodos fixos (`2021|2024|2025`), então a coleta "nova" de 24/11 não trouxe o ano mais recente. A busca principal da pauta é "população de Porto Alegre 2026".
+- Ambiente: o host `servicodados.ibge.gov.br` não estava na lista de hosts permitidos do ambiente pandora-cloud (a coleta anterior foi feita em outro ambiente). Foi liberado com aprovação do usuário.
+- Correção: o coletor passou a pedir 2026 e foi rodado com `--refazer` (o manifesto registra a data e o novo SHA-256). O tratamento de capitais agora inclui a população até 2026. O ranking das capitais filtra 2026. O `vigiar` deu 0 indicador alterado nas matérias publicadas.
+- Regra para a próxima vez: antes de redigir matéria com dado anual "atual", confirme na fonte se já saiu um período mais novo do que o da ficha. O coletor com períodos fixos não percebe. Para população, o IBGE publica a estimativa de 1º de julho no fim de agosto.
+- Fotos: a API do Wikimedia Commons limita requisições (HTTP 429) depois de poucas buscas. `thumb.wikimedia.org` está bloqueado no ambiente; use `upload.wikimedia.org/.../thumb/<h>/<hh>/<arquivo>/1280px-<arquivo>`, com espera entre tentativas. A busca do Banco de Imagens da Prefeitura (`/search/imagem`) devolve 500. As fotos do banco estão no Commons como "IBPA nnnnn", com licença de atribuição. Evite foto com criança ou estudante identificável e foto que sugira juízo (porta trancada) em matéria de dados.
