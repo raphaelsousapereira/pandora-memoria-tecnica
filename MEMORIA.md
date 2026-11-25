@@ -690,3 +690,14 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Limites: "Success" quer dizer que o endpoint IndexNow aceitou o envio. Não garante indexação. Não houve verificação no Bing Webmaster Tools, que fica com o dono do site.
 - Próxima ocorrência: em outro site com o mesmo plugin, gerar chave própria (`secrets.token_hex(16)`), gravar via `apiKey`, conferir `/<chave>.txt` e então enviar. Python urllib leva 406 do filtro de bots deste host; curl funciona.
 - Evidência: commit 8f7d9ac em porto-alegre-em-dados, ramo claude/portoalegreemdados-wpvibe-signup-s9bciv.
+
+## 2026-11-25 · PORTOALEGRE-2026-008 · Padrão de rodapé editorial: o bloco preto pesado parecia amador
+
+- Projeto, componente: Porto Alegre em Dados, `site/rodape/rodape.html` e `site/dist/assets/rodape.css` (WPCode #65); repositório porto-alegre-em-dados 7b5da90.
+- Pedido: o editor achou o rodapé pouco sofisticado e mostrou o da Folha de S.Paulo como referência.
+- Memória consultada: PORTOALEGRE-2026-006 (WPCode e tema). Nenhum caso de padrão visual de rodapé.
+- O que tornava o anterior fraco: fundo preto chapado, texto de 15 a 17 px igual ao do corpo, botão branco grande competindo com a marca, endereço em parágrafo corrido no topo e editorias quebradas em duas colunas dentro de uma.
+- Padrão adotado (vale para os rodapés PANDORA de sites editoriais): fundo claro; marca pequena (30 a 34 px) e uma ação curta em caixa-alta separada por fio vertical; "Topo" à direita; fio escuro de 1 px fechando a faixa; grade de 4 colunas de links mais 1 coluna institucional (descrição, independência, endereço); títulos de coluna de 0,72rem em caixa-alta com espaçamento de 0,08em; links de 0,86rem em cinza escuro, com alvo de no mínimo 28 px; linha de base de 0,72rem. A hierarquia vem de tamanho, peso e fios, não de blocos de cor. No celular ficam 2 colunas (1 só abaixo de 340 px) para o rodapé não virar uma lista enorme.
+- Armadilha: `href="#top"` é válido pelo HTML (sobe ao topo sem âncora), mas o `tools/verificar_site.py` acusava âncora inexistente; o verificador agora aceita `#top`.
+- Verificação: render em Chromium a 1366 e 390 px sem rolagem horizontal; verificar_site com 0 erro em 120 páginas. Teste de render com `loading="lazy"` via `setContent` não carrega a imagem: troque por eager só no teste.
+- Próxima ocorrência: começar por este padrão e trocar só a marca, a cor da ação e as colunas.
