@@ -825,3 +825,20 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   mediana 11,2%) e a 3ª maior margem livre (56,1%), mas investimentos de só 3,9% da despesa (19ª; mediana 6,4%).
   Cuidado: pessoal terceirizado aparece como custeio e infla a margem livre.
 - Próxima ocorrência: abrir o custeio por elemento antes de afirmar que a margem foi para custeio por escolha (H5).
+
+## 2026-11-26 · PORTOALEGRE-2026-019 · Custeio e SUS, subsídio do ônibus e as 180 metas do PROMETA
+
+- Projeto: Porto Alegre em Dados; commits e9311cd, 9d5228e, 42c45aa e f3bdaf0.
+- H5 testada: o custeio de Porto Alegre (52,2% da despesa em 2025, 3ª maior fatia entre capitais) é puxado pelos
+  repasses a entidades sem fins lucrativos (modalidade 50: 14,5% da despesa, mediana 2,5%), compatíveis com o SUS
+  contratado: transferências do SUS recebidas em 2025 de R$ 1.623,6 mi da União e R$ 282,7 mi do Estado. A "margem
+  livre" superestima a escolha. Armadilha: o código das transferências do SUS na DCA I-C mudou de 1.7.1.8.03 (até
+  2021) para 1.7.1.3 (depois); usar a conta de nível mais alto, sem somar subcontas.
+- H3: as notícias oficiais de reajuste dão passagem, tarifa técnica, custo anual e subsídio previsto (R$ 250 mi em
+  2026, 66% do investimento de 2025). A mesma notícia da Prefeitura existe em dois endereços: deduplicar por data e
+  passagem. Valor anunciado é previsão, não pagamento.
+- Promessas: a régua é o PROMETA 2025-2028 (180 metas da campanha formalizadas pela Prefeitura), na seção 5 do PPA
+  2026-2029. Armadilhas do PDF: colunas lidas por posição (o eixo gruda no texto com um espaço só), numeração com 3 ou
+  4 dígitos ("Meta 0100"), metas repetidas nas páginas de programa (cortar a seção logo depois da Meta 180), e
+  "Conclusão em 2025" aparece no lugar do programa.
+- Próxima ocorrência: meta vaga sem número entra como "não mensurável" e não conta como descumprida.
