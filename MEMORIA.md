@@ -825,3 +825,19 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   mediana 11,2%) e a 3ª maior margem livre (56,1%), mas investimentos de só 3,9% da despesa (19ª; mediana 6,4%).
   Cuidado: pessoal terceirizado aparece como custeio e infla a margem livre.
 - Próxima ocorrência: abrir o custeio por elemento antes de afirmar que a margem foi para custeio por escolha (H5).
+
+## 2026-11-26 · CLOUD-2026-CATALOG-001 · Preço por item de catálogo: tempo de máquina é desprezível, o custo está na revisão pt-PT
+
+- Projeto, componente, ambiente, revisão e fuso horário: pandora-cloud, `engine/PANDORA_CATALOG.py` 1.0.0, commits d00c359 e fd39cf7 no ramo `claude/pensive-planck-d547fr`; container de sessão cloud; America/Sao_Paulo.
+- Pedido e critério observável de aceite: loja WooCommerce portuguesa pediu orçamento discriminado por item (cerca de 300 fichas e imagens por mês, em pt-PT). Aceite: motor gera ficha completa a partir de EAN/marca/medidas/material sem inventar números, trata imagens e mede o tempo por serviço (SPEC-CATALOG-1 a 7 em `specs/2026-11-catalog.md`).
+- Memória consultada antes da mudança (commit e IDs): MEMORIA.md@6b2e98cbc5fac43e3935bcfa4407cc91a1de78eb; nenhum caso de catálogo; aplicados PORTOALEGRE-2026-006 (JSON-LD fora do conteúdo por causa do wpautop, `&` escapado) e a regra de nenhum número sem origem.
+- Sintoma, ponto de reprodução, comportamento esperado e observado: risco de cobrar fichas por estimativa. Medido com `PANDORA_CATALOG.py demo --n 300`: 0,7 s para 300 fichas sem imagens; 45 s com imagens 2000×2000 (0,15 s por imagem, 4,9 MB → 0,8 MB).
+- Hipóteses em ordem e teste que diferencia cada uma: (1) o gargalo é a geração de texto → falso, 0,09 s no lote; (2) é o tratamento de imagens → verdadeiro para a máquina, mas segundos por lote; (3) é a revisão humana nativa de pt-PT → só o cronómetro da pré-visualização mede.
+- Tentativas em ordem, comando ou ação, resultado e motivo para mudar de caminho: frases de FAQ ("Sim. Tem proteção IPX7…") reaproveitadas no texto corrido soavam como resposta; criadas variantes `*_texto` sem "Sim./Não.". Perfil com "vá subindo" passou no detetor de pt-BR: o padrão de gerúndio não tinha "vá"; corrigido e coberto por teste.
+- Causa demonstrada, evidência e causas ainda incertas: o custo do serviço é humano (revisão, conferência de dados, publicação). Ainda incerto: minutos reais de revisão por ficha numa loja real e o tempo de descarregar imagens por URL do fornecedor (fica "pendente" na v1).
+- Correção exata, arquivos, configurações e condições de aplicação: motor com perfis por categoria sem números próprios; `numeros_inventados()` marca "rever"; `alertas_pt_br()`; WebP 1200 px q82; CSV do importador WooCommerce; `tempos` e `orcamento` (preço = minutos/60 × custo/hora × (1+margem)); exemplo em `engine/dados/catalog_servicos_exemplo.json`.
+- Verificação de implementação, build, runtime e jornada do usuário: `python -m unittest tests.test_catalog` 16 OK; pré-visualização no Chromium a 390 px mede e exporta CSV; portão de governança APROVADO.
+- Cobertura real, simulações, falhas de ambiente e limites da conclusão: só dados fictícios; importação real no WooCommerce não testada.
+- Recuperação, efeitos colaterais e como reconhecer regressão: ficha com "{" ou campo vazio no texto indica perfil sem `preencher()`; ficha "rever" por número indica perfil com número fixo.
+- Próxima ocorrência: antes de orçar qualquer serviço por item, medir 20 a 30 itens com o cronómetro e passar o CSV ao `orcamento`; o preço por custo é o piso, não o preço de mercado.
+- Links de evidência revisados, PR, deploy, data e responsável pela confirmação: ramo claude/pensive-planck-d547fr em pandora-cloud (sem PR ainda); 26/11/2026; confirmação pendente do operador.
