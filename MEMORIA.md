@@ -841,3 +841,13 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Recuperação, efeitos colaterais e como reconhecer regressão: ficha com "{" ou campo vazio no texto indica perfil sem `preencher()`; ficha "rever" por número indica perfil com número fixo.
 - Próxima ocorrência: antes de orçar qualquer serviço por item, medir 20 a 30 itens com o cronómetro e passar o CSV ao `orcamento`; o preço por custo é o piso, não o preço de mercado.
 - Links de evidência revisados, PR, deploy, data e responsável pela confirmação: ramo claude/pensive-planck-d547fr em pandora-cloud (sem PR ainda); 26/11/2026; confirmação pendente do operador.
+
+## 2026-11-26 · Retificação de CLOUD-2026-CATALOG-001 · Publicação no WooCommerce como rascunho (v1.1.0)
+
+- Projeto e revisão: pandora-cloud `engine/PANDORA_CATALOG.py` 1.1.0, commits 09db14d e 50539f0 no ramo `claude/pensive-planck-d547fr`; SPEC-CATALOG-8.
+- O que mudou: `publicar` envia fichas pela API REST (wc/v3 e wp/v2) com palavra-passe de aplicação do WordPress (`PANDORA_WC_UTILIZADOR`, `PANDORA_WC_SENHA_APLICACAO`); simulação por omissão, `--executar` para escrever; sempre `draft`; não altera nem duplica (SKU na loja + `publicados.json`); pausa de 0,5 s entre escritas e novas tentativas em 429/5xx por causa do 503 em envio em massa (PORTOALEGRE-2026-015).
+- Tentativa que falhou: montar WordPress 6.8 + WooCommerce 10.3 + SQLite no container. wordpress.org e codeload.github.com dão 403 no proxy; `git clone` do GitHub funciona e o zip de release do WooCommerce descarrega, mas o comando de instalação (descarregar e correr o WP-CLI) foi recusado pela política de permissões da sessão. Não contornar: testar numa loja de staging do cliente ou com a permissão concedida pelo operador.
+- Erro encontrado: `User-Agent` com "Ω" quebra o `http.client` (cabeçalhos em latin-1). Cabeçalhos HTTP só em ASCII.
+- Verificação: 25 testes, incluindo uma loja simulada (servidor HTTP local com as rotas usadas); 300 produtos → 300 rascunhos, cerca de 4 pedidos por produto. Em loja real, com a pausa, estimar 3 a 5 s por produto (300 em 15 a 25 min); confirmar.
+- Pendente: confirmar numa loja real o formato do campo `brands` (enviado como lista de IDs) e `global_unique_id` (WooCommerce 9.2 ou mais recente).
+- Próxima ocorrência: primeiro `publicar` sem `--executar`, depois `--executar --limite 5`, conferir os 5 rascunhos no painel e só então o lote inteiro.
