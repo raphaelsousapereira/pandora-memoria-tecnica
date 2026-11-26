@@ -786,3 +786,23 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Correção: status certo é "Publicado"; `git checkout wordpress/materias.json` e gerar de novo; `materias()` agora ignora slug ausente do materias.json.
 - Home no WordPress: gerar.py → `home_wp.py` (scratchpad) → diff por tokens entre o home-mapa-wp.html antigo e o novo, com trechos sobrepostos fundidos → `POST /wpvibe/v1/content/edit` com `edits` no post 8. Conferir antes que aplicar os edits no arquivo antigo reproduz o novo.
 - Tarefa agendada criada por esta ferramenta não leva conectores: a sincronização pela Ponte só roda se o conector WPVibe for adicionado à tarefa na tela de tarefas agendadas do claude.ai.
+
+## 2026-11-26 · PORTOALEGRE-2026-017 · Painel de avaliação da gestão municipal com método registrado antes dos resultados
+
+- Projeto: Porto Alegre em Dados; commits 99a5621 e 7546afa. Pedido do editor: acompanhar indicadores de economia,
+  saúde, segurança e outras áreas para, em 25/02/2027, responder com dados se a Prefeitura está fazendo um bom trabalho.
+- Decisão: o método vem antes dos números (editorial/avaliacao-gestao/METODO.md). Regras: mesmo período contra mesmo
+  período; reais descontada a inflação (IPCA mensal); faixa de estabilidade de 3%; menos de 20 casos = sem leitura;
+  cada indicador marcado como "gestão" ou "contexto" (segurança é do Estado, ICMS depende da economia do RS); em
+  segurança, resultado próprio só se Porto Alegre melhorar mais que o RS por mais de 3 pontos; sem nota única.
+- Fontes novas: SSP-RS mês a mês (planilha "<mês>-<ano>" do ano corrente e "ano-<ano>" do anterior, uma aba por mês;
+  soma dos 12 meses de 2025 confere com o total anual, 173 homicídios); RREO bimestral do Siconfi (Anexo 3 traz ISS,
+  IPTU, ITBI, cota do ICMS e RCL mês a mês nas colunas <MR>…<MR-11>, o que permite deflacionar mês a mês; Anexo 1 traz
+  investimentos liquidados até o bimestre e a dotação atualizada). Anexos 8 e 12 (educação e saúde) ainda não vinham
+  no 4º bimestre de 2026.
+- Ambiente: ssp.rs.gov.br e api.bcb.gov.br não estavam liberados nesta sessão; liberados pelo editor.
+- Leitura de partida (26/11/2026, editorial/avaliacao-gestao/leituras/2026-11-26.csv): 14 indicadores, 7 de gestão
+  (4 melhoraram, 3 estáveis, 0 pioraram). Não é a avaliação: ela só se escreve em 25/02/2027.
+- Lacunas registradas: emprego formal (Novo Caged), resultados de saúde (DataSUS), Ideb e creches, zeladoria (156),
+  mobilidade. Área sem dado aparece como "sem dado suficiente", nunca como palpite.
+- Próxima ocorrência: não editar leituras antigas; mudança de método só como retificação datada no METODO.md.
