@@ -1,0 +1,288 @@
+{
+  "formato": "pandora-bom/1",
+  "kit": "1.0.0",
+  "projeto": "pandora-memoria-tecnica",
+  "gerado_em": "2026-11-26T15:36:23+00:00",
+  "base": "72c4469c0412376c749a519e881ff582baa74a8f",
+  "head": "a32cfbcaf375ef1243940013be64f2daea8a88b9",
+  "commits": [
+    {
+      "sha": "a32cfbcaf375ef1243940013be64f2daea8a88b9",
+      "autor": "Claude",
+      "data": "2026-11-26T15:23:04+00:00",
+      "titulo": "PORTOALEGRE-2026-018: caderno de gestão pública, margem livre das capitais (armadilha das intraorçamentárias) e continuidade entre sessões",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "bd9902eac712a1b541d5a572f8f21dfaa51dd107",
+      "autor": "Claude",
+      "data": "2026-11-26T12:34:07+00:00",
+      "titulo": "PORTOALEGRE-2026-017: painel de avaliação da gestão com método registrado antes dos resultados",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "1277c1005ce23f82a6f415ad60556959a95b5246",
+      "autor": "Claude",
+      "data": "2026-11-25T23:58:41+00:00",
+      "titulo": "PORTOALEGRE-2026-016: fontes de lazer e editais de cultura; gerar.py e status de pauta",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "9a11a2f77ca18339b418c1bc4cd50621492a25ee",
+      "autor": "Claude",
+      "data": "2026-11-25T23:04:18+00:00",
+      "titulo": "PORTOALEGRE-2026-015: páginas de bairro e 503 ao publicar em massa",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "049856a5d28fb88f1f3740f7b5d2a197c09da910",
+      "autor": "Claude",
+      "data": "2026-11-25T22:08:17+00:00",
+      "titulo": "PORTOALEGRE-2026-014: PANDORA Ponte, custo de contexto medido e regras de integridade",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "904f151641222d89dcbc14ed724670b5a82092ce",
+      "autor": "Claude",
+      "data": "2026-11-25T19:02:13+00:00",
+      "titulo": "PORTOALEGRE-2026-013: FAQ ampliado, FAQPage e edição em massa via WPVibe",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "71819dec8550df212dc50009864ae3a5aeef799e",
+      "autor": "Claude",
+      "data": "2026-11-25T17:54:23+00:00",
+      "titulo": "Retificação de PORTOALEGRE-2026-012: núcleo e camadas",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "409bb8e83d8b690d9113b45a16bcd7083ff0294a",
+      "autor": "Claude",
+      "data": "2026-11-25T17:47:24+00:00",
+      "titulo": "PORTOALEGRE-2026-012: arco narrativo e Narrativa Score",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "7a2c2d3ae6b27bceb87584b931de802c901e4a85",
+      "autor": "Claude",
+      "data": "2026-11-25T17:34:11+00:00",
+      "titulo": "MEMORIA: PORTOALEGRE-2026-011 Guarda Civil Metropolitana na folha",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "e9875789064870b159778ca9a51b7637b12d1c29",
+      "autor": "Claude",
+      "data": "2026-11-25T13:39:57+00:00",
+      "titulo": "MEMORIA: PORTOALEGRE-2026-010 estimativa de 2026 ausente na ficha",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "bc2dd35e4ed744cd609c2071db7ee989073de6cd",
+      "autor": "Claude",
+      "data": "2026-11-25T13:07:08+00:00",
+      "titulo": "MEMORIA: PORTOALEGRE-2026-009 glossário público nas páginas",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "f6518231c8cd1b8f23b255ac8b96963744a00492",
+      "autor": "Claude",
+      "data": "2026-11-25T12:32:37+00:00",
+      "titulo": "MEMORIA: PORTOALEGRE-2026-008 padrão de rodapé editorial",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "70e1b5a90fbe5cf6cea1b2f19a98a8d2d1a06a0a",
+      "autor": "Claude",
+      "data": "2026-11-25T11:19:03+00:00",
+      "titulo": "MEMORIA: PORTOALEGRE-2026-007 IndexNow com chave mascarada",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "0cbafe4df83ec6216832dbd64b87a81bda07028e",
+      "autor": "Claude",
+      "data": "2026-11-25T02:47:33+00:00",
+      "titulo": "PORTOALEGRE-2026-006: envio ao WordPress (wpautop, SVG no CSS, tabela cortada)",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "3efe08a00f4870b149e4ded1b2590c3cb37a6bd1",
+      "autor": "Claude",
+      "data": "2026-11-24T21:16:31+00:00",
+      "titulo": "Governança: registro do PR de memória atualizado",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "1738fe8ddf7b9b3aa1a2051e29c671237654d2f7",
+      "autor": "Claude",
+      "data": "2026-11-24T21:16:31+00:00",
+      "titulo": "Memória: PORTOALEGRE-2026-005 (pôlderes 7 e 8, LicitaCon do DMAE)",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "bd90cf2a5f93b39860fd5e6446514b19b6f9ed47",
+      "autor": "Claude",
+      "data": "2026-11-24T20:58:44+00:00",
+      "titulo": "Governança: BOM e registro do PR de memória",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "70f8be57525f7e7c83ba2048bb04855d608efe94",
+      "autor": "Claude",
+      "data": "2026-11-24T20:58:43+00:00",
+      "titulo": "Memória: lições da sessão Porto Alegre em Dados (WPVibe 526, ITBI, Commons 429, gerador, GEO Score)",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    }
+  ],
+  "ia": {
+    "agentes": [
+      "Claude"
+    ],
+    "sessoes": [
+      "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+    ],
+    "commits_com_ia": 18,
+    "commits": 18
+  },
+  "arquivos": [
+    {
+      "caminho": "MEMORIA.md",
+      "estado": "M",
+      "sha256": "045802275c6117ffdac2f556d9e311bb875359dccdaa573eee6ec33964df8dad"
+    }
+  ],
+  "especificacao": {
+    "itens": [],
+    "sem_spec": "mudança só de documentação (entradas novas em MEMORIA.md, sem alterar entradas antigas)."
+  },
+  "memoria": {
+    "commit": "72c4469"
+  },
+  "portao": {
+    "aprovado": true,
+    "itens": [
+      {
+        "id": "G1",
+        "status": "aprovado"
+      },
+      {
+        "id": "G2",
+        "status": "aprovado"
+      },
+      {
+        "id": "G3",
+        "status": "aprovado"
+      },
+      {
+        "id": "G4",
+        "status": "aprovado"
+      },
+      {
+        "id": "G5",
+        "status": "aprovado"
+      },
+      {
+        "id": "G6",
+        "status": "aprovado"
+      },
+      {
+        "id": "G7",
+        "status": "aprovado"
+      }
+    ]
+  },
+  "aprovacao_humana": {
+    "tipo": "pull_request",
+    "estado": "pendente",
+    "nota": "A aprovação humana é o review e o merge deste PR no GitHub."
+  }
+}

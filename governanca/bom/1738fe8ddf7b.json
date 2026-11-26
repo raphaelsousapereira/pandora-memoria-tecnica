@@ -1,0 +1,108 @@
+{
+  "formato": "pandora-bom/1",
+  "kit": "1.0.0",
+  "projeto": "pandora-memoria-tecnica",
+  "gerado_em": "2026-11-24T21:16:31+00:00",
+  "base": "72c4469c0412376c749a519e881ff582baa74a8f",
+  "head": "1738fe8ddf7b9b3aa1a2051e29c671237654d2f7",
+  "commits": [
+    {
+      "sha": "1738fe8ddf7b9b3aa1a2051e29c671237654d2f7",
+      "autor": "Claude",
+      "data": "2026-11-24T21:16:31+00:00",
+      "titulo": "Memória: PORTOALEGRE-2026-005 (pôlderes 7 e 8, LicitaCon do DMAE)",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "bd90cf2a5f93b39860fd5e6446514b19b6f9ed47",
+      "autor": "Claude",
+      "data": "2026-11-24T20:58:44+00:00",
+      "titulo": "Governança: BOM e registro do PR de memória",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    },
+    {
+      "sha": "70f8be57525f7e7c83ba2048bb04855d608efe94",
+      "autor": "Claude",
+      "data": "2026-11-24T20:58:43+00:00",
+      "titulo": "Memória: lições da sessão Porto Alegre em Dados (WPVibe 526, ITBI, Commons 429, gerador, GEO Score)",
+      "agentes_ia": [
+        "Claude"
+      ],
+      "sessoes": [
+        "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+      ]
+    }
+  ],
+  "ia": {
+    "agentes": [
+      "Claude"
+    ],
+    "sessoes": [
+      "https://claude.ai/code/session_01X5twfR3fGFkMYsGbLxi4jU"
+    ],
+    "commits_com_ia": 3,
+    "commits": 3
+  },
+  "arquivos": [
+    {
+      "caminho": "MEMORIA.md",
+      "estado": "M",
+      "sha256": "405160b3a375c0346a3485ac89590fac9fa5ae48622522f84cd135a3f5649bdf"
+    }
+  ],
+  "especificacao": {
+    "itens": [],
+    "sem_spec": "registro de memória técnica (documentação), sem mudança de código."
+  },
+  "memoria": {
+    "commit": "72c4469"
+  },
+  "portao": {
+    "aprovado": true,
+    "itens": [
+      {
+        "id": "G1",
+        "status": "aprovado"
+      },
+      {
+        "id": "G2",
+        "status": "aprovado"
+      },
+      {
+        "id": "G3",
+        "status": "aprovado"
+      },
+      {
+        "id": "G4",
+        "status": "aprovado"
+      },
+      {
+        "id": "G5",
+        "status": "aprovado"
+      },
+      {
+        "id": "G6",
+        "status": "aprovado"
+      },
+      {
+        "id": "G7",
+        "status": "aprovado"
+      }
+    ]
+  },
+  "aprovacao_humana": {
+    "tipo": "pull_request",
+    "estado": "pendente",
+    "nota": "A aprovação humana é o review e o merge deste PR no GitHub."
+  }
+}

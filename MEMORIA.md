@@ -4,6 +4,8 @@
 
 Índice pesquisável: AUDIO-2026-001 · Dora · microfone oculto · Render live · Whisper · feature flag · Chromium · transcrição em português. Acrescente os próximos projetos ao índice e ao final do arquivo.
 
+Índice Porto Alegre em Dados: PORTOALEGRE-2026-001 · WPVibe 526 · SSL de site novo · PORTOALEGRE-2026-002 · ITBI · m² por bairro · efeito de composição · prédios novos · PORTOALEGRE-2026-003 · Wikimedia Commons 429 · Banco de Imagens da Prefeitura · PORTOALEGRE-2026-004 · tempo de leitura inflado · gerador não determinístico · CSV CRLF · GEO-2026-001 · GEO Score editorial · falsos negativos do medidor · PORTOALEGRE-2026-005 · LicitaCon DMAE 54907 · contrato não localizado · valor de comunicado divergente.
+
 ## 2026-11-20 · AUDIO-2026-001 · O portal estava online e o microfone continuava oculto
 
 ### Pedido e aceite
@@ -596,3 +598,230 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - **PRs:** saas-forge #7 (fonte, juntar primeiro), cloud #298, corpo #166, competitor-discovery #14, saas-base #23, visual #2, glossário #3 e o PR desta memória.
 - **Limites:** aprovação humana fica "pendente" no BOM (o merge é a aprovação); sem tokens/custo por sessão; PRs simultâneos conflitam no `registro.jsonl` (ficar com o principal e rodar `registrar` de novo).
 - **Próxima ocorrência:** portão reprovou? Leia o detalhe do G-ID. G2: acrescente a dependência ao contrato no mesmo PR, com motivo. G5: regenere pela fonte. G6: cite `SPEC-…`/`Sem spec: …` e `Memória: <commit>`. Kit desatualizado: `instalar --checar` sai 1.
+
+## 2026-11-24 · PORTOALEGRE-2026-001 · WPVibe recusa conectar site novo: HTTP 526 (SSL)
+
+- **Projeto, componente, ambiente, revisão e fuso horário:** porto-alegre-em-dados; conector WPVibe (`connect_site`); sessão Claude Code na nuvem; horários de Brasília.
+- **Pedido e critério observável de aceite:** gerar o link de um clique do WPVibe para cadastrar `https://portoalegreemdados.com.br/` (WordPress criado no mesmo dia).
+- **Memória consultada antes da mudança:** não consultada no início da sessão (falha de processo, ver PORTOALEGRE-2026-004). Busca posterior por "526", "SSL", "WPVibe": nenhum caso igual.
+- **Sintoma:** `connect_site` devolve "Cloudflare returned HTTP 526"; o relay de IP fixo do WPVibe também falha no handshake TLS. O usuário confirma no navegador: "Não seguro".
+- **Causa demonstrada:** certificado SSL ainda não emitido para o domínio recém-apontado (o servidor responde com certificado provisório ou de outro nome). Não é falha do WPVibe nem do WordPress.
+- **Tentativas:** três chamadas a `connect_site` com o mesmo erro; `curl` da sessão bloqueado pelo proxy (host não liberado), então a verificação do certificado ficou com o usuário.
+- **Correção:** fora do nosso alcance: emitir Let's Encrypt (domínio e www) no painel da hospedagem; com Cloudflare, usar "Full" até a origem ter certificado. Depois, repetir `connect_site`.
+- **Próxima ocorrência:** primeiro teste é abrir o domínio no navegador ou `openssl s_client -servername <dominio> -connect <dominio>:443` e ler "Emitido para". Não remova conexão nem desative segurança por causa do 526. Site novo: esperar a propagação de DNS e a emissão do certificado antes de conectar.
+
+## 2026-11-24 · PORTOALEGRE-2026-002 · ITBI: "valorização" de bairro era prédio novo, não preço
+
+- **Projeto, componente, ambiente, revisão e fuso horário:** porto-alegre-em-dados; `coletores/poa_itbi.py`, `tratamento/itbi_poa.py`, fichas `itbi-*`; dados abertos da Prefeitura (ITBI 2020–2026, CC BY); horários de Brasília.
+- **Pedido e critério observável de aceite:** matéria "bairros para comprar imóvel" com números oficiais, para disputar com a Urban Company a resposta de buscadores de IA.
+- **Sintoma:** mediana do m² de apartamento por bairro subia muito acima da inflação em Rio Branco (+66,6% real 2021–2025), Sarandi (+39,8%), Boa Vista e Três Figueiras.
+- **Hipóteses e teste que diferencia:** (1) alta real de preço; (2) mudança no tipo de imóvel vendido. Teste: separar por ano de construção. Rio Branco 2025: 311 de 589 apartamentos com até 3 anos (2021: 9); usados ficaram quase estáveis (R$ 5.615 → 5.884 nominal). Hipótese 2 confirmada.
+- **Correção:** variação entre anos só com apartamentos usados (prédio com mais de 3 anos) e só em bairros com 100+ vendas em cada ano (com 30, Praia de Belas oscilava −46%). Fatia de prédios novos publicada como dado próprio (onde estão os lançamentos).
+- **Outras armadilhas da base:** (a) guia com várias unidades traz a base de cálculo só na primeira linha: m² só em guias de uma unidade; (b) o mesmo imóvel pago no mesmo dia em mais de uma guia (3.242 casos: retificação, partilha): contar uma vez por matrícula+zona+dia; (c) arquivo é por ano da estimativa, pagamento pode cair no ano seguinte, logo 2020 fica incompleto; (d) bairro do cadastro fiscal abreviado e cortado em 15 caracteres, com espaço sobrando, nomes antigos ("JAR ITU SABARA") e "ZN INDEFINIDA 2": tabela `tratamento/mapas/bairros-itbi.csv` para os 94 bairros da Lei 12.112/2016; (e) base de cálculo é o maior entre declarado e valor de referência, não preço de mercado; (f) a lista de bairros extraída do PDF da lei perdeu "Vila Nova" numa quebra de página (93 de 94): conferir a contagem.
+- **Verificação:** `verificar_dados.py` 0 erro (tratamento reproduz do bruto), motor e testes OK; resultado coerente: 34 de 35 bairros abaixo da inflação, exceto Jardim Botânico.
+- **Próxima ocorrência:** qualquer média de preço por região (ITBI, anúncios, IPTU): antes de publicar variação, separar novo de usado e olhar a composição. Mínimo de amostra por célula decidido antes de ver o ranking.
+
+## 2026-11-24 · PORTOALEGRE-2026-003 · Fotos do Wikimedia Commons travaram (HTTP 429); Banco de Imagens da Prefeitura resolveu
+
+- **Projeto, componente, ambiente:** porto-alegre-em-dados; imagem obrigatória por matéria; sessão na nuvem com proxy de saída (IP compartilhado).
+- **Sintoma:** API do Commons respondeu 429 em sequência; original em `upload.wikimedia.org` deu 429 ("use thumbnail images in sizes listed"); `thumburl` e `Special:FilePath` redirecionam para `thumb.wikimedia.org`, que o proxy bloqueia; o download ficou parado em backoff por mais de 8 minutos.
+- **O que funcionou no Commons:** miniatura em tamanho padrão no caminho com hash MD5: `upload.wikimedia.org/wikipedia/commons/thumb/<h0>/<h0h1>/<arquivo>/1280px-<arquivo>`, uma por vez, com intervalo.
+- **Solução adotada:** Banco de Imagens da Prefeitura (`bancodeimagens.portoalegre.rs.gov.br`). Cada página de foto diz: "O uso das fotos produzidas pela Agência Porto Alegre é livre", crédito obrigatório ("Nome do Fotógrafo / PMPA"); oferece versão G (2048 px); busca em `/search/node?keys=`. Fotos recentes e sem limite de taxa.
+- **Cuidados editoriais:** evitar fotos com autoridades em matéria explicativa (parece propaganda); legenda segue a descrição oficial da foto, sem inferir lugar; alt descreve a imagem vista.
+- **Próxima ocorrência:** começar pelo Banco de Imagens da Prefeitura para Porto Alegre; Commons só com miniatura de 1280 px pelo caminho com hash.
+
+## 2026-11-24 · PORTOALEGRE-2026-004 · Gerador do site: tempo de leitura inflado, saída não determinística, CSV reescrito inteiro
+
+- **Projeto, componente:** porto-alegre-em-dados, `site/gerar.py`, `editorial/100-artigos-iniciais.csv`.
+- **Sintomas e causas demonstradas:**
+  1. "Leitura: 24 minutos" numa matéria de 8: a contagem de palavras incluía tabelas das fichas, `<details>` de cuidados e o JSON-LD `Dataset` embutido. Correção: remover `script`, `table`, `details` e `style` antes de contar.
+  2. Proposta de usar `datetime.date.today()` para data de rascunho no export do WordPress quebraria a regra "mesma entrada, mesma saída" (`verificar_site.py` compara `dist` com o gerador). Correção: sem data quando não há `publicado_em`.
+  3. Reescrever o CSV editorial com `csv.DictWriter` padrão trocou todas as quebras de linha por CRLF (diff de 202 linhas para mudar 10). Correção: editar só as linhas com `sed` ancorado no número da pauta, ou `lineterminator="\n"`.
+  4. Botão "Compartilhar" do WhatsApp herdou o estilo de ícone redondo de 44 px (`.compartilhar a`). Correção: escopo `.compartilhar ul a`.
+  5. Tabelas das fichas com rolagem não eram focáveis (axe `scrollable-region-focusable`): o motor passou a gerar `tabindex="0" role="region" aria-label`.
+- **Processo:** a memória técnica não foi consultada no início da sessão porque o AGENTS.md do porto-alegre-em-dados não tinha a regra. Acrescentada no mesmo dia.
+- **Próxima ocorrência:** depois de mudar o gerador, publicar temporariamente uma matéria, tirar captura em 390 px e rodar axe antes de dar por pronto. Conferir números visíveis (tempo de leitura, datas) contra o texto.
+
+## 2026-11-24 · GEO-2026-001 · GEO Score editorial: o medidor errou nos dois lados até ser conferido item a item
+
+- **Projeto, componente:** porto-alegre-em-dados `tools/geo_score.py` (rubrica `editorial-0.1`, adaptada de `geo-generative-engine-optimization-framework/pesquisas/geo-score-seguros-brasil`).
+- **Pedido:** comparar a página da Urban Company citada na busca com as nossas e ficar no mesmo nível ou acima.
+- **Falsos negativos encontrados ao conferir verificação por verificação:** (1) assinatura e data do concorrente ficam fora de `<article>`: ler a região do H1 em diante; (2) data sem ano ("06 de Novembro") e mês com maiúscula; (3) link de WhatsApp de contato com corretor (`phone=`) contado como compartilhamento: exigir `send?text=`; (4) organização dentro de `publisher` não era lida: percorrer objetos JSON-LD aninhados; (5) assinatura sem "Por": aceitar `rel="author"`.
+- **Resultado com o método corrigido:** Urban 51,0 (pesos iguais 47,5); nossa matéria com dados do ITBI 96,7; média de 11 matérias 94,4. A nota mede prontidão, não citações reais; nossas páginas ainda não estavam no ar.
+- **Próxima ocorrência:** nunca relatar nota de GEO sem antes abrir o detalhe das verificações que zeraram nos dois lados; publicar também a nota com pesos iguais; registrar limites (não mede citações, rubrica autoral).
+
+## 2026-11-24 · PORTOALEGRE-2026-005 · Obra dos pôlderes 7 e 8: comunicado com valor divergente e contrato das obras civis fora do LicitaCon
+
+- **Projeto, componente:** porto-alegre-em-dados, pauta 52; `coletores/tce_rs.py --orgaos 54907`, `tratamento/dmae_cheias.py`, fichas `dmae-*`.
+- **Memória consultada antes da mudança:** main 72c4469 (sem entradas sobre o tema) e ramo bd90cf2 (PORTOALEGRE-2026-002 a 004).
+- **Sintoma:** comunicados da Prefeitura deram para a mesma etapa um investimento em junho/agosto/setembro e outro, maior, na entrega (24/11/2026). A regra do projeto proíbe número sem ficha.
+- **Testes e resultado:** (1) o arquivo do LicitaCon que já tínhamos é só da Prefeitura (órgão 54900); autarquias têm código próprio: DMAE = 54907 (achado pela API CKAN `dados.tce.rs.gov.br/api/3/action/package_search?q=DMAE`). (2) No DMAE, a compra das bombas flutuantes confere com o comunicado (dispensa 4/2026, 17 bombas, vazão somada igual à anunciada). (3) O contrato das obras civis do dique e das comportas (junho a agosto de 2026) não está nem no 54907 nem no 54900. Causas possíveis, não demonstradas: contratação por outro órgão (Estado, Funrigs), registro atrasado ou objeto descrito sem as palavras buscadas.
+- **Correção editorial:** a matéria publica só os valores com ficha (bombas e licitação da EBAP 10), diz que o custo total não pôde ser conferido e que os comunicados divergem, sem repetir os números; a pauta exige pergunta ao DMAE antes de publicar.
+- **Armadilhas da base:** campo de valor com percentual de desconto (1,08) em pregão de manutenção: valores abaixo de R$ 1.000 ficam vazios; itens trazem a vazão na descrição ("1.000 l/s"); dispensa de 2024 sobre "diques de terra da região norte" é de projetos, não de obra (ler o objeto inteiro antes de resumir).
+- **Motor:** `texto()` agora escreve AAAA-MM-DD por extenso nas frases das fichas.
+- **Próxima ocorrência:** obra pública com valor em comunicado: procurar o contrato no LicitaCon do órgão executor certo (lista de órgãos pela API CKAN), comparar com o comunicado e, se não achar, dizer que não foi localizado e perguntar ao órgão antes de publicar.
+
+
+## 2026-11-25 · PORTOALEGRE-2026-006 · WordPress via WPVibe: wpautop quebra JSON-LD, SVG pesa metade do post, tabela cortada contradiz a frase
+
+- Projeto, componente, ambiente, revisão e fuso horário: Porto Alegre em Dados, envio de 7 páginas e 12 matérias ao WordPress 7.1.5 (tema Page Builder Framework, WPCode, Yoast) pelo WPVibe; repositório porto-alegre-em-dados f897741; America/Sao_Paulo.
+- Pedido e critério observável de aceite: políticas e matérias em rascunho no WordPress, com categoria, imagem destacada, crédito da foto, ícones de compartilhar, avatar e estilos.
+- Memória consultada antes da mudança (commit e IDs): ORQUESTRADOR-2026-015 (escrita só por `rest_api_write`), PORTOALEGRE-2026-001 (WPVibe e SSL).
+- Sintoma, ponto de reprodução, comportamento esperado e observado: (1) o HTML das matérias tinha ícones SVG repetidos no topo e no fim, cerca de 50% do tamanho; (2) conteúdo clássico com `<script type="application/ld+json">` multilinha recebe `<br>` do `wpautop` no front; (3) o validador do WPVibe acusou `&` cru em `href` (bloco inválido no editor); (4) a ficha `itbi-m2-usados-bairros-2025` dizia "Rubem Berta, a menor", mas `max_linhas: 60` cortava os dois últimos de 62 bairros.
+- Hipóteses em ordem e teste que diferencia cada uma: medir o peso dos SVG por regex; procurar `&(?!amp;)` em todos os `href`; comparar a contagem de linhas da tabela com o total citado na frase.
+- Tentativas em ordem, comando ou ação, resultado e motivo para mudar de caminho: enviar o HTML como estava (~380 KB) foi descartado; o avatar local não tem URL pública e o `request_upload` depende do usuário; um post de 47 KB passou do limite prático de uma chamada.
+- Causa demonstrada, evidência e causas ainda incertas: as quatro foram demonstradas pelos testes acima. Não foi testado se o tema mostra a imagem destacada acima do título, o que duplicaria a foto que vai no conteúdo.
+- Correção exata, arquivos, configurações e condições de aplicação: `tools/wordpress_envio.py` troca os SVG por `<span class="pi pi-NOME">`, com o desenho em `mask-image` no CSS do WPCode; embute o avatar em base64 no CSS; põe a foto com `class="wp-image-ID"` (o srcset é gerado) e a envolve em `<!-- wp:html -->`, porque com blocos o `wpautop` não roda. Posts grandes: criar com a primeira parte terminando em `<!-- /wp:html -->` e anexar o resto com `/wpvibe/v1/content/edit`, trocando o marcador final pela próxima parte mais o marcador. Na ficha, `max_linhas` passou a 100. O `&` virou `&amp;`. IDs gravados em `wordpress/enviados.json`. O WordPress tinha `comment_moderation=0` e `show_avatars=1`, contra o texto da política de privacidade: os dois foram corrigidos, e `wp_page_for_privacy_policy` passou a 22.
+- Verificação de implementação, build, runtime e jornada do usuário: `MD5(post_content)` por `db query` igual ao MD5 local nos 12 posts; render dos ícones em Chromium (LinkedIn e e-mail saíram quebrados porque o regex removia `width`/`height` dos `<rect>` internos; corrigido limitando a troca à tag `<svg>`); verificar_dados, testes do motor e verificar_site com 0 erro.
+- Cobertura real, simulações, falhas de ambiente e limites da conclusão: o rascunho não abre sem login, então o render no tema não foi visto. O snippet CSS (#61) fica desligado até o usuário ativar. O permalink `/%category%/%postname%/` depende de aprovação no WPVibe; a primeira expirou.
+- Recuperação, efeitos colaterais e como reconhecer regressão: se os ícones sumirem, o snippet #61 está desligado. Bloco "inválido" no editor indica `&` cru. Frase de ficha citando um item ausente da tabela indica `max_linhas` curto.
+- Próxima ocorrência: checar `wordpress/enviados.json` e editar os posts existentes. Testar antes de enviar: `href` com `&` cru e frase da ficha contra as linhas da tabela.
+- Links de evidência revisados, PR, deploy, data e responsável pela confirmação: commit f897741 em porto-alegre-em-dados, ramo claude/portoalegreemdados-wpvibe-signup-s9bciv; confirmação visual pendente com o editor.
+
+## 2026-11-25 · PORTOALEGRE-2026-007 · IndexNow (plugin do Bing): "Invalid API Key" com a chave mascarada do plugin
+
+- Projeto, componente, ambiente, revisão e fuso horário: Porto Alegre em Dados, plugin `indexnow` do Bing Webmaster Tools 1.0.4 no WordPress 7.1.5, operado pelo WPVibe; repositório porto-alegre-em-dados 8f7d9ac; America/Sao_Paulo.
+- Pedido e critério observável de aceite: enviar ao Bing todas as URLs públicas do site (home, 7 políticas, 12 matérias, 10 editorias) e ver cada envio aprovado no plugin.
+- Memória consultada antes da mudança (commit e IDs): PORTOALEGRE-2026-006 (envio via WPVibe), ORQUESTRADOR-2026-015 (escrita só por `rest_api_write`). Nenhum caso de IndexNow.
+- Sintoma: reabrir e salvar posts não gerava envio (o envio automático só vale para mudanças de status depois de ativado). `POST /indexnow/v_1.0.4/submitUrl` respondia "Invalid API Key".
+- Causa demonstrada: a chave que o plugin devolve em `apiSettings` vem mascarada, e reenviá-la grava a máscara. Definir uma chave nova de 32 hex por `POST /indexnow/v_1.0.4/apiKey {"APIKey":"<chave>"}` faz o plugin servir `/<chave>.txt` na raiz (200 text/plain), e a partir daí `submitUrl` responde `{"error":""}`.
+- Correção: chave própria definida pela rota `apiKey` (chaves IndexNow são públicas por definição) e registrada em `wordpress/enviados.json`. Envio de uma URL por chamada a `submitUrl`.
+- Verificação: `getStats` deu PassedSubmissionCount 30 e FailedSubmissionCount 0; `allSubmissions` lista cada URL com "Success". O arquivo da chave responde 200.
+- Limites: "Success" quer dizer que o endpoint IndexNow aceitou o envio. Não garante indexação. Não houve verificação no Bing Webmaster Tools, que fica com o dono do site.
+- Próxima ocorrência: em outro site com o mesmo plugin, gerar chave própria (`secrets.token_hex(16)`), gravar via `apiKey`, conferir `/<chave>.txt` e então enviar. Python urllib leva 406 do filtro de bots deste host; curl funciona.
+- Evidência: commit 8f7d9ac em porto-alegre-em-dados, ramo claude/portoalegreemdados-wpvibe-signup-s9bciv.
+
+## 2026-11-25 · PORTOALEGRE-2026-008 · Padrão de rodapé editorial: o bloco preto pesado parecia amador
+
+- Projeto, componente: Porto Alegre em Dados, `site/rodape/rodape.html` e `site/dist/assets/rodape.css` (WPCode #65); repositório porto-alegre-em-dados 7b5da90.
+- Pedido: o editor achou o rodapé pouco sofisticado e mostrou o da Folha de S.Paulo como referência.
+- Memória consultada: PORTOALEGRE-2026-006 (WPCode e tema). Nenhum caso de padrão visual de rodapé.
+- O que tornava o anterior fraco: fundo preto chapado, texto de 15 a 17 px igual ao do corpo, botão branco grande competindo com a marca, endereço em parágrafo corrido no topo e editorias quebradas em duas colunas dentro de uma.
+- Padrão adotado (vale para os rodapés PANDORA de sites editoriais): fundo claro; marca pequena (30 a 34 px) e uma ação curta em caixa-alta separada por fio vertical; "Topo" à direita; fio escuro de 1 px fechando a faixa; grade de 4 colunas de links mais 1 coluna institucional (descrição, independência, endereço); títulos de coluna de 0,72rem em caixa-alta com espaçamento de 0,08em; links de 0,86rem em cinza escuro, com alvo de no mínimo 28 px; linha de base de 0,72rem. A hierarquia vem de tamanho, peso e fios, não de blocos de cor. No celular ficam 2 colunas (1 só abaixo de 340 px) para o rodapé não virar uma lista enorme.
+- Armadilha: `href="#top"` é válido pelo HTML (sobe ao topo sem âncora), mas o `tools/verificar_site.py` acusava âncora inexistente; o verificador agora aceita `#top`.
+- Verificação: render em Chromium a 1366 e 390 px sem rolagem horizontal; verificar_site com 0 erro em 120 páginas. Teste de render com `loading="lazy"` via `setContent` não carrega a imagem: troque por eager só no teste.
+- Próxima ocorrência: começar por este padrão e trocar só a marca, a cor da ação e as colunas.
+
+## 2026-11-25 · PORTOALEGRE-2026-009 · Glossário público ligado às páginas do site e do WordPress
+
+- Projeto, componente: Porto Alegre em Dados; `site/termos.py`, `tools/sync_glossario.py`, cópia em `site/glossario/`; página WordPress 116; repositório porto-alegre-em-dados 18e6b61. Fonte: raphaelsousapereira/glossario-porto-alegre-em-dados 99fd5aa (30 verbetes em `verbetes.md`, índice de 400 termos no README).
+- Pedido: usar o glossário em todas as páginas.
+- Memória consultada: PORTOALEGRE-2026-006 (envio por partes e `content/edit`) e PORTOALEGRE-2026-008 (padrão visual).
+- Decisão: cópia versionada com SHA-256, no modelo das cópias de motores PANDORA (o verificador falha se alguém editar à mão). Liga só a primeira ocorrência de cada termo, e só em `p`, `li` e `dd`; títulos, links, tabelas, legendas, `nav` e `aside` ficam de fora. Cada matéria ganha o quadro "Termos desta matéria", e o site ganha a página `/glossario/` com JSON-LD `DefinedTermSet` e `DefinedTerm`.
+- Armadilha 1: o conteúdo publicado no WordPress diverge do gerado. As matérias publicadas depois ganharam ícone e data de publicação, e o `wordpress_envio.compactar` não conhece o ícone de calendário. Por isso o diff "antes e depois" a partir do repositório não serve.
+- Saída da armadilha 1: aplicar `termos.ligar` sobre o HTML público (curl, sem gastar contexto) e mandar só os trechos de texto alterados por `content/edit` em lote. Se o trecho se repete (ex.: "Cadastro Único" sozinho num `strong`), alargue com as tags vizinhas até ficar único. O lote é tudo-ou-nada, então um trecho divergente só faz a chamada falhar.
+- Armadilha 2: o verificador de âncoras lê os `@id` do JSON-LD. Um `#glossario` sem elemento correspondente gerou 30 erros. O `@id` do conjunto passou a ser a própria URL.
+- Armadilha 3: no WordPress a página não tem a classe `.glossario`. Os estilos dos verbetes usam só `.verbete`.
+- Verificação: página 116 com MD5 igual ao local (cf212877…) e publicada em /glossario/ (200, 30 verbetes, JSON-LD sem `<br>`); 11 matérias e 2 políticas com termos; verificar_site com 0 erro em 121 páginas; IndexNow aceitou a URL.
+- Pendências: CSS no WPCode #70 e link no rodapé #65 aguardam aprovação. Sem esse CSS, o termo aparece como link comum e o quadro fica sem moldura.
+- Próxima ocorrência: verbete novo → sync, gerar e atualizar a página 116; matéria nova já sai com os termos.
+
+## 2026-11-25 · PORTOALEGRE-2026-010 · Ficha "atual" desatualizada: a estimativa de população de 2026 já existia
+
+- Projeto: Porto Alegre em Dados, coletor `coletores/ibge.py`, fichas `populacao-poa` e `populacao-capitais-ranking`; commit 9ba1075 em porto-alegre-em-dados.
+- Sintoma: na matéria "Qual é a população de Porto Alegre?", a ficha dizia 2025 (1.388.794), mas o IBGE publicou a estimativa de 2026 (1.388.791) em 27/8/2026. O coletor pedia períodos fixos (`2021|2024|2025`), então a coleta "nova" de 24/11 não trouxe o ano mais recente. A busca principal da pauta é "população de Porto Alegre 2026".
+- Ambiente: o host `servicodados.ibge.gov.br` não estava na lista de hosts permitidos do ambiente pandora-cloud (a coleta anterior foi feita em outro ambiente). Foi liberado com aprovação do usuário.
+- Correção: o coletor passou a pedir 2026 e foi rodado com `--refazer` (o manifesto registra a data e o novo SHA-256). O tratamento de capitais agora inclui a população até 2026. O ranking das capitais filtra 2026. O `vigiar` deu 0 indicador alterado nas matérias publicadas.
+- Regra para a próxima vez: antes de redigir matéria com dado anual "atual", confirme na fonte se já saiu um período mais novo do que o da ficha. O coletor com períodos fixos não percebe. Para população, o IBGE publica a estimativa de 1º de julho no fim de agosto.
+- Fotos: a API do Wikimedia Commons limita requisições (HTTP 429) depois de poucas buscas. `thumb.wikimedia.org` está bloqueado no ambiente; use `upload.wikimedia.org/.../thumb/<h>/<hh>/<arquivo>/1280px-<arquivo>`, com espera entre tentativas. A busca do Banco de Imagens da Prefeitura (`/search/imagem`) devolve 500. As fotos do banco estão no Commons como "IBPA nnnnn", com licença de atribuição. Evite foto com criança ou estudante identificável e foto que sugira juízo (porta trancada) em matéria de dados.
+
+## 2026-11-25 · PORTOALEGRE-2026-011 · Folha com dois nomes para a mesma Guarda: a Lei Complementar 1.049/2025 explica
+
+- Projeto: Porto Alegre em Dados, matéria "Quanto ganha um guarda municipal em Porto Alegre?" (post 158), fichas `guarda-gcm1-poa` e `guarda-cargos-poa`; commit 8350ad6.
+- Sintoma: a folha de outubro de 2026 traz ao mesmo tempo "GUARDA MUNICIPAL" (129 vínculos) e "GUARDA CIVIL METROPOLITANO I/II/III". Sem contexto, a matéria compararia dois cargos como se fossem diferentes ou somaria o efetivo errado.
+- Causa demonstrada: a Lei Complementar 1.049, de 8/8/2025, publicada em 18/8, criou a Guarda Civil Metropolitana, com subsídio por classe (Anexo IV) pago a 90%, 95% em 2026 e 100% a partir de 2027 (art. 11). Os guardas ativos foram reenquadrados nas classes I a III (arts. 41 e 42). Quem pediu em 90 dias ficou no cargo antigo, em quadro em extinção (art. 49).
+- Fonte: o número da lei saiu primeiro em notícia, mas foi confirmado na API do SAPL (`legislacao.portoalegre.rs.gov.br/api/norma/normajuridica/?numero=1049&ano=2025`). O PDF está guardado por `coletores/documentos_oficiais.py` (id `lc-1049-2025-gcm`).
+- Armadilha de interpretação: a mediana da folha da classe I (R$ 5.087,86) fica acima do subsídio de 2026 (95% de R$ 4.188,09). A lei garante uma parcela de equivalência individual a quem veio da carreira antiga, mas a folha não separa essa parcela. O texto não atribui a diferença a ela; diz que não dá para saber quanto vem dela.
+- Motor: `tabela` ganhou o parâmetro `limite` (as N primeiras linhas depois de ordenar), com teste.
+- Próxima ocorrência: cargo com nome novo ou duplicado na folha pede busca da lei de carreira no SAPL antes de comparar. Valores de lei entram citados com artigo e anexo.
+
+## 2026-11-25 · PORTOALEGRE-2026-012 · GEO alto não é texto memorável: arco narrativo e Narrativa Score
+
+- Projeto: Porto Alegre em Dados, `editorial/alma-pandora.md`, `tools/narrativa_score.py`, rascunhos de "a cada R$ 100" em `editorial/rascunhos/`; commit 85db60f.
+- Sintoma: as matérias passavam no GEO Score (90+) e seguiam todas o mesmo molde (pergunta → resposta → prova → cuidado). O texto era citável, mas faltavam três coisas: por que ler agora, contraste entre números e um fecho. O cuidado que muda a leitura ficava no fim.
+- Tentativa limitada: o pedido era ler 30 colunas dos maiores colunistas. Folha, O Globo, Estadão, GZH, UOL, Correio do Povo, El País e Poder360 recusam leitura automatizada. Meio, Nexo, Intercept, Pública e CartaCapital não estão na lista de hosts do ambiente. Foram lidos 11 textos (Brasil de Fato e Matinal). Não contorne bloqueio; peça ao editor colunas coladas ou a liberação dos hosts.
+- Correção: o arco de sete movimentos (gancho, achado, contraste, escala humana, virada, consequência, eco) tem tabela de contexto: completo para explicativos e reportagens, leve para guias, nenhum para fichas e políticas. O checklist virou `tools/narrativa_score.py`, que lê só o texto a partir do `<p class="resumo">`; antes dele há migalhas e autoria, e o primeiro teste dava falso negativo.
+- Evidência: mesmos dados e fontes, GEO 90,4 → 93,0 (só "evidências", por nomear o IBGE) e Narrativa 25 → 100. As seis matérias publicadas ficam entre 55 e 90. O GEO não mede narrativa; não use o GEO para julgar se o texto melhorou.
+- Próxima ocorrência: matéria nova passa pelos dois scores. Escala humana vem de ficha (por morador, por dia); personagem só com entrevista real. Contraste só entre números da mesma base.
+
+## 2026-11-25 · Retificação de PORTOALEGRE-2026-012 · De arco fixo para núcleo e camadas
+
+- Projeto: Porto Alegre em Dados, commit 12be577.
+- Nova evidência: com a rede liberada para Meio, Nexo, Intercept, Pública, CartaCapital e Sumaúma (aprovação do usuário), foram lidos mais 19 textos: 10 da CartaCapital, 6 da Pública e 3 da Sumaúma. O total chegou a 30. O Intercept responde 403 e não foi contornado. O Meio publica resumo de notícias, não coluna, e ficou fora. A página de colunas do Nexo não existe no endereço testado.
+- Correção do entendimento: nenhum dos textos usa todos os movimentos do arco. Exigir os sete em todo texto era erro. O modelo virou núcleo (achado, prova, cuidado) mais camadas escolhidas por tipo de texto. O `narrativa_score.py --tipo` só cobra as camadas pedidas.
+- Armadilha de coleta: o HTML dos veículos traz bio do autor, pedidos de apoio e rodapés repetidos como `<p>`. Descarte os parágrafos que se repetem entre textos do mesmo veículo e corte nos pedidos de apoio antes de contar traços.
+
+## 2026-11-25 · PORTOALEGRE-2026-013 · FAQ subaproveitado e sem FAQPage; edição em massa de posts pelo WPVibe
+
+- Projeto: Porto Alegre em Dados, `site/gerar.py` (`com_faq_ld`), `editorial/alma-pandora.md`; commits 4949ff2 e 6fe8023.
+- Sintoma: as 19 matérias publicadas tinham 0 a 4 perguntas frequentes (11 guias sem nenhuma) e nenhum JSON-LD `FAQPage`.
+- Correção: 110 perguntas novas, com respostas tiradas só do texto e das fichas de cada matéria. O gerador cria o `FAQPage` a partir de `<h2 id="perguntas">` (cada `<h3>` e o `<p>` seguinte), no site e no WordPress. Regra: 6 a 10 perguntas, ou 4 a 8 em respostas rápidas; não repetir intertítulo literalmente; uma resposta, um parágrafo.
+- Armadilha 1: o difflib sobre o `materias.json` inteiro leva minutos e não serve de âncora. O ícone de relógio é SVG no arquivo e `pi-relogio` no WordPress. Use âncoras curtas e conhecidas: `<span>Leitura: N minutos</span>` e os ~60 caracteres antes de `<h2 id="fontes">Fontes</h2>`. Aplique tudo em lote por post (`edits`).
+- Armadilha 2: JSON-LD com `indent=2` dobra o tamanho de cada edição. Use `separators=(",", ":")`.
+- Armadilha 3: depois de um reinício do worker, uma chamada pode não ter rodado. Confira com `db query "SELECT LOCATE('<id novo>', post_content) ..."` antes de reenviar. Reenviar é seguro, porque a âncora antiga deixa de existir depois da edição.
+- Verificação: o `FAQPage` das 19 páginas publicadas foi lido e tem o mesmo número de perguntas do arquivo local. O post 164 tem MD5 igual ao local. O IndexNow aceitou as 19 URLs. Uma página respondeu devagar e passou na segunda tentativa: aumente o timeout antes de concluir que houve falha.
+
+## 2026-11-25 · PORTOALEGRE-2026-014 · Publicar sem colar conteúdo (PANDORA Ponte) e regras de integridade dos dados
+
+- Projeto: Porto Alegre em Dados; commits 5c409b7 (dados) e bb87368 (publicar.py). Caixa de saída pública: raphaelsousapereira/porto-alegre-em-dados-publicado (commit cb6cfea). Snippet WPCode #190.
+- Sintoma: publicar e editar pelo WPVibe passava o texto inteiro por chamada. O `claude-context-cost` mediu 566 milhões de tokens de entrada em 1.145 respostas numa sessão longa: 33% vieram de texto escrito em chamadas, 30% de saída de Bash e 2% dos CLAUDE.md/AGENTS.md somados.
+- Tentativa que falhou: senha de aplicativo injetada pelo proxy. O WordPress respondeu `incorrect_password` várias vezes: o usuário estava certo, a senha no formulário não. Armadilha: o WPVibe mascara `_application_passwords` no `db query` como `[wpvibe-masked: credential]` (27 caracteres), e eu concluí por engano que não havia senha. Liste as senhas pela REST (`/wp/v2/users/1/application-passwords`), que mostra nome, criação e último uso.
+- Correção: `publicar.py exportar` grava `pacote.json` (ID, slug, MD5 e conteúdo) num repositório público só com o que é publicado. O snippet PANDORA Ponte expõe `POST /pandora/v1/sincronizar {"sha","aplicar"}`, só para administrador: busca o pacote por commit, recusa post cujo ID ou slug não confere, salva, confere o MD5 e avisa o IndexNow. O primeiro uso atualizou 15 matérias (4 já iguais) numa chamada; as 19 páginas passaram na conferência do FAQPage.
+- Regras de dados: (1) soma contra o total da própria fonte. A SSP-RS tem a linha "Total": 75 combinações conferidas. (2) Ausente não é zero, salvo prova: o Siconfi omite a coluna liquidada quando nada foi liquidado (49 linhas), e só vira 0 onde a soma bate com o total declarado, registrado em `obs`. (3) Vazio em todos os entes do ano interrompe a coleta.
+- Próxima ocorrência: publicar = gerar → exportar → push na caixa de saída → `sincronizar` com `aplicar:false` e depois `true`. Nunca colar matéria em chamada.
+
+## 2026-11-25 · PORTOALEGRE-2026-015 · Páginas de bairro e 503 da HostGator ao publicar em massa pela Ponte
+
+- Projeto: Porto Alegre em Dados; commits 11bd373 e 10481e1; caixa de saída e7cb68e e fdc9afb. 95 páginas em /dados/bairros/ (índice + 94 bairros), além das 25 de /dados/.
+- Dados: o IBGE publica o Censo 2022 por bairro no nível N102 (agregados 9923 e 9922; `localidades=N102[N6[4314902]]`). Os 94 bairros somam 1.332.845, igual ao total do município. Armadilhas: o nome vem em dois formatos ("X - Porto Alegre - RS" e "X - Porto Alegre (RS)"), e "Mont Serrat" no IBGE é "Montserrat" na Prefeitura. O cadastro de escolas do SIE corta o bairro em 20 caracteres, abrevia "VL" e tem 3 linhas com 2 campos a mais nas redes sociais; não traz escolas estaduais nem federais.
+- Sintoma: `sincronizar` com `publicar:true` para 95 páginas devolveu 503 da HostGator (limite de tempo e recursos do servidor). 51 foram publicadas e 44 ficaram em rascunho. A resposta não chegou, e o IndexNow dessas 51 não foi enviado pela Ponte.
+- Correção: conferir o estado no banco (`db query` com contagem por `post_status`) e repetir a mesma chamada. A Ponte é idempotente e pula o que já está igual; a segunda rodada publicou as 44 e avisou o IndexNow.
+- Próxima ocorrência: publicar em lotes de até ~40 páginas (falta um parâmetro `limite` na Ponte). Peça só campos curtos na resposta (`fields: aplicado,indexnow`) e conte o resultado no banco, em vez de trazer a lista inteira para a conversa.
+
+## 2026-11-25 · PORTOALEGRE-2026-016 · Fontes oficiais de lazer e editais de cultura; gerar.py quebra ao mudar status
+
+- Projeto: Porto Alegre em Dados; commits 5d7e417 e 4d7bdbc; caixa de saída aa0091f. Guia de lazer gratuito por região (post 473), editais de cultura abertos (post 474), fichas /dados/parques-horarios-poa/ e /dados/editais-cultura-abertos/ (páginas 483 e 482). Coleta semanal criada como tarefa agendada (segundas, 5h17 de Brasília).
+- Fontes: Carta de Serviços da Prefeitura (parques, atualizada em 21/02/2025) contradiz a página própria do Morro do Osso (horário) e da Reserva do Lami (só visita agendada): mostrar as duas, cada uma com a fonte. Pró-Cultura RS vem em cp1252; páginas da Prefeitura em UTF-8 com bytes soltos (ler com "replace"). estado.rs.gov.br recusa User-Agent "Mozilla/5.0" e aceita o padrão do curl. Página da DOPA é app em JavaScript: usar a da SMC.
+- Sintoma: `site/gerar.py` deu KeyError em `fichas_paginas.materias` depois de mudar o status da pauta. Causa: `fichas_paginas.estatico` roda antes de `gerar.py` reescrever `wordpress/materias.json`, e um status inválido ("Publicada" em vez de "Publicado") já tinha gravado um materias.json sem as duas matérias.
+- Correção: status certo é "Publicado"; `git checkout wordpress/materias.json` e gerar de novo; `materias()` agora ignora slug ausente do materias.json.
+- Home no WordPress: gerar.py → `home_wp.py` (scratchpad) → diff por tokens entre o home-mapa-wp.html antigo e o novo, com trechos sobrepostos fundidos → `POST /wpvibe/v1/content/edit` com `edits` no post 8. Conferir antes que aplicar os edits no arquivo antigo reproduz o novo.
+- Tarefa agendada criada por esta ferramenta não leva conectores: a sincronização pela Ponte só roda se o conector WPVibe for adicionado à tarefa na tela de tarefas agendadas do claude.ai.
+
+## 2026-11-26 · PORTOALEGRE-2026-017 · Painel de avaliação da gestão municipal com método registrado antes dos resultados
+
+- Projeto: Porto Alegre em Dados; commits 99a5621 e 7546afa. Pedido do editor: acompanhar indicadores de economia,
+  saúde, segurança e outras áreas para, em 25/02/2027, responder com dados se a Prefeitura está fazendo um bom trabalho.
+- Decisão: o método vem antes dos números (editorial/avaliacao-gestao/METODO.md). Regras: mesmo período contra mesmo
+  período; reais descontada a inflação (IPCA mensal); faixa de estabilidade de 3%; menos de 20 casos = sem leitura;
+  cada indicador marcado como "gestão" ou "contexto" (segurança é do Estado, ICMS depende da economia do RS); em
+  segurança, resultado próprio só se Porto Alegre melhorar mais que o RS por mais de 3 pontos; sem nota única.
+- Fontes novas: SSP-RS mês a mês (planilha "<mês>-<ano>" do ano corrente e "ano-<ano>" do anterior, uma aba por mês;
+  soma dos 12 meses de 2025 confere com o total anual, 173 homicídios); RREO bimestral do Siconfi (Anexo 3 traz ISS,
+  IPTU, ITBI, cota do ICMS e RCL mês a mês nas colunas <MR>…<MR-11>, o que permite deflacionar mês a mês; Anexo 1 traz
+  investimentos liquidados até o bimestre e a dotação atualizada). Anexos 8 e 12 (educação e saúde) ainda não vinham
+  no 4º bimestre de 2026.
+- Ambiente: ssp.rs.gov.br e api.bcb.gov.br não estavam liberados nesta sessão; liberados pelo editor.
+- Leitura de partida (26/11/2026, editorial/avaliacao-gestao/leituras/2026-11-26.csv): 14 indicadores, 7 de gestão
+  (4 melhoraram, 3 estáveis, 0 pioraram). Não é a avaliação: ela só se escreve em 25/02/2027.
+- Lacunas registradas: emprego formal (Novo Caged), resultados de saúde (DataSUS), Ideb e creches, zeladoria (156),
+  mobilidade. Área sem dado aparece como "sem dado suficiente", nunca como palpite.
+- Próxima ocorrência: não editar leituras antigas; mudança de método só como retificação datada no METODO.md.
+
+## 2026-11-26 · PORTOALEGRE-2026-018 · Caderno de gestão pública, margem livre das capitais e continuidade entre sessões
+
+- Projeto: Porto Alegre em Dados; commits bd03c63 e 2c1029d.
+- Continuidade: `CONTINUAR.md` na raiz do repositório reúne onde está cada coisa, o fluxo de publicação pela Ponte,
+  IDs do WordPress, tarefas agendadas e pendências; `AGENTS.md` aponta para ele. Os scripts de atualização da home
+  estavam só no scratchpad da sessão (seriam perdidos): agora em `tools/home_wordpress.py`, que gera as edições a
+  partir do `git show HEAD:wordpress/home-mapa-wp.html` e confere que reproduzem o mapa novo.
+- Caderno `editorial/gestao-publica/`: regras para opinar (fato/interpretação/opinião, melhor argumento contrário,
+  competência antes de culpa, margem antes de mérito, opinião assinada pelo editor), mapa de competências com base
+  constitucional, diário de hipóteses H1-H5 (cada uma com o que a refutaria), estruturas de atores e promessas sem
+  conteúdo sem fonte.
+- Armadilha da DCA Anexo I-D: o grupo "Pessoal e Encargos" inclui as intraorçamentárias (códigos DI, modalidade 91;
+  contribuição patronal ao próprio RPPS). Somar com as aposentadorias conta duas vezes: em Porto Alegre, R$ 1,57 bi
+  em 2023. Usar despesa sem intra: total menos a soma das linhas `DI?.?.91.00.00.00`.
+- Achado: Porto Alegre tem a maior fatia de aposentadorias e pensões entre as 26 capitais (19,9% da despesa em 2025;
+  mediana 11,2%) e a 3ª maior margem livre (56,1%), mas investimentos de só 3,9% da despesa (19ª; mediana 6,4%).
+  Cuidado: pessoal terceirizado aparece como custeio e infla a margem livre.
+- Próxima ocorrência: abrir o custeio por elemento antes de afirmar que a margem foi para custeio por escolha (H5).
