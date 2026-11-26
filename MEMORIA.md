@@ -806,3 +806,22 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
 - Lacunas registradas: emprego formal (Novo Caged), resultados de saúde (DataSUS), Ideb e creches, zeladoria (156),
   mobilidade. Área sem dado aparece como "sem dado suficiente", nunca como palpite.
 - Próxima ocorrência: não editar leituras antigas; mudança de método só como retificação datada no METODO.md.
+
+## 2026-11-26 · PORTOALEGRE-2026-018 · Caderno de gestão pública, margem livre das capitais e continuidade entre sessões
+
+- Projeto: Porto Alegre em Dados; commits bd03c63 e 2c1029d.
+- Continuidade: `CONTINUAR.md` na raiz do repositório reúne onde está cada coisa, o fluxo de publicação pela Ponte,
+  IDs do WordPress, tarefas agendadas e pendências; `AGENTS.md` aponta para ele. Os scripts de atualização da home
+  estavam só no scratchpad da sessão (seriam perdidos): agora em `tools/home_wordpress.py`, que gera as edições a
+  partir do `git show HEAD:wordpress/home-mapa-wp.html` e confere que reproduzem o mapa novo.
+- Caderno `editorial/gestao-publica/`: regras para opinar (fato/interpretação/opinião, melhor argumento contrário,
+  competência antes de culpa, margem antes de mérito, opinião assinada pelo editor), mapa de competências com base
+  constitucional, diário de hipóteses H1-H5 (cada uma com o que a refutaria), estruturas de atores e promessas sem
+  conteúdo sem fonte.
+- Armadilha da DCA Anexo I-D: o grupo "Pessoal e Encargos" inclui as intraorçamentárias (códigos DI, modalidade 91;
+  contribuição patronal ao próprio RPPS). Somar com as aposentadorias conta duas vezes: em Porto Alegre, R$ 1,57 bi
+  em 2023. Usar despesa sem intra: total menos a soma das linhas `DI?.?.91.00.00.00`.
+- Achado: Porto Alegre tem a maior fatia de aposentadorias e pensões entre as 26 capitais (19,9% da despesa em 2025;
+  mediana 11,2%) e a 3ª maior margem livre (56,1%), mas investimentos de só 3,9% da despesa (19ª; mediana 6,4%).
+  Cuidado: pessoal terceirizado aparece como custeio e infla a margem livre.
+- Próxima ocorrência: abrir o custeio por elemento antes de afirmar que a margem foi para custeio por escolha (H5).
