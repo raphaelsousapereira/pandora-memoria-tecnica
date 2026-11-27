@@ -825,3 +825,25 @@ Com autorização de publicação, o PR #296 foi integrado à main em `714384939
   mediana 11,2%) e a 3ª maior margem livre (56,1%), mas investimentos de só 3,9% da despesa (19ª; mediana 6,4%).
   Cuidado: pessoal terceirizado aparece como custeio e infla a margem livre.
 - Próxima ocorrência: abrir o custeio por elemento antes de afirmar que a margem foi para custeio por escolha (H5).
+
+
+## 2026-11-27 · PORTOALEGRE-2026-019 · Narrativa por palavras-chave não valida qualidade; portão local ALMA v3
+
+- Projeto: Porto Alegre em Dados, ALMA PANDORA; main 2c1904ae6a50889a3875437390a6534e679d6544, fuso Brasília.
+- Pedido: 72 regras contextualizadas, memória narrativa, auditoria e bloqueio de publicação.
+- Memória consultada: main 6b2e98cbc5fac43e3935bcfa4407cc91a1de78eb; PORTOALEGRE-2026-012, 013, 014 e GEO-2026-001.
+- Sintoma demonstrado por leitura de código: narrativa_score.py procura sinais lexicais e retorna zero como exit code mesmo para nota baixa; publicar.py publicava sem registro de revisão. GEO Score fixava o ano em 2026.
+- Correção proposta no PR #11: catálogo de 72 regras por gênero, Human Score baseado em avaliações documentadas, registro de evidências por afirmação, revisão vinculada a SHA-256 do HTML, checagem de divergência remota e validade, proteção de publicação e atualização direta, similaridade de aberturas e ano dinâmico. Não substituir dados nem revisão humana por heurística.
+- Verificação: commit a99ba15ee65dead84bd5462987125d34f69d53b4 confirmado no GitHub; nove testes sintéticos adicionados, não executados. Não houve deploy ou publicação. Rubrica humana não valida semântica das fontes; o arquivo de aprovação não autentica o editor. Ponte, WPVibe e painel ainda são caminhos distintos: exigir revisão manual e implementar controle no servidor antes de automatizar. Não enviar dados sigilosos à caixa pública.
+- Próxima ocorrência: consultar o catálogo, testar ausência de fonte, falha crítica, aprovação vencida e HTML alterado; rodar unittest, verificar_dados.py e verificar_site.py localmente antes do merge; validar integração da Ponte antes de declarar bloqueio universal.
+- Evidência: https://github.com/raphaelsousapereira/porto-alegre-em-dados/pull/11 (rascunho, revisão pendente).
+
+### Complemento de validação — 27/11/2026
+- Os nove testes originais passaram em cópia local com hashes Git correspondentes. Teste adversarial reproduziu aceitação de editor/revisão nulos, ressalva nula, dispensa indevida de RES-09 e bloco sem inventário.
+- Correções no PR #11: campos textuais estritos, declaração booleana de crítica a terceiros em qualquer gênero, RES-09 condicional, triagem de blocos com inventário ou dispensa justificada. 16/16 testes locais passaram; hashes dos cinco arquivos alterados conferidos com o GitHub. Commit final b79ab5be1e6c90b48e7bd5df0e715bd936667fca.
+- Piloto com educação, pôlderes 7/8 e IPTU, trechos antes/depois sem publicação. A triagem não prova cobertura de todas as afirmações nem valida fontes semanticamente. Suíte integral, autenticação do editor e integração da Ponte/WPVibe continuam pendentes. Não usar Actions nem declarar deploy ou aprovação inexistente.
+
+### Complemento: portão WordPress — 27/11/2026
+- Ponte #190 lida via WPVibe; MD5 valida bytes, não autorização editorial. Portão separado em wordpress/alma-v3/portao.php (commit e2bd6ca0102df201273c834cec548f6888476154). Aprovação por sessão de navegador e nonce, HMAC com salt do servidor, 24h, vínculo da versão anterior e candidata. Nota e hash do registro são atestados pelo editor.
+- PHP 8.4 lint OK; 12/12 testes com stubs passaram; hashes Git d3573ce00f2dd463b72fd0a68b210d38e9bec2b5 e ae7fabd1446e859b20460b3163366bd1acadb94c conferidos. WPVibe salvou snippet #1138 DESLIGADO. Consulta de posts futuros retornou lista vazia. Sem publicação, sem alteração na Ponte #190, sem Actions.
+- Não ativar antes de homologação: bloqueio via hook de post padrão, não protege SQL direto, wp_publish_post direto, metadados, fichas/páginas, corrida de concorrência. Lotes podem parar parcialmente. Necessários testes de navegador/nonce, slashing/CRLF, staging e pré-validação de lotes. Rollback: desativar apenas o portão. Só usuário pode ativar WPCode.
